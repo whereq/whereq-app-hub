@@ -1,0 +1,118 @@
+.params-tab {
+    padding: 0; /* Removed padding around the tab */
+    margin: 0; /* Ensure no extra margin is applied */
+}
+
+.params-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0; /* Ensure no margin around the table */
+    box-sizing: border-box; /* Ensure padding doesn't affect table width */
+}
+
+.params-table th,
+.params-table td {
+    border: 1px solid #d1d5db;
+    padding: 0 4px; /* Removed padding to align input boxes */
+    text-align: left;
+    height: 30px; /* Reduced row height */
+}
+
+.params-table th {
+    font-size: 0.75rem;
+    /* font-weight: bold; */
+    color: #4b5563;
+    background-color: #f9fafb;
+    line-height: 30px; /* Center-align header text vertically */
+}
+
+.params-table td input[type="text"],
+.params-table td input[type="checkbox"] {
+    width: 100%;
+    height: 100%;
+    border: none; /* Remove default input borders */
+    font-size: 0.75rem;
+    /* padding: 0 4px; Adjust padding inside the input box */
+    box-sizing: border-box; /* Ensure no overflow */
+    outline: none; /* Remove focus outline */
+    background: transparent; /* Match the table cell background */
+}
+
+.params-table td input[type="text"]:focus {
+    border: 1px solid #2563eb; /* Add a focus border for better usability */
+    background: #f1f5f9; /* Highlight the focused input */
+}
+
+.params-table td input[type="checkbox"] {
+    display: block;
+    margin: auto;
+    height: 15px; /* Adjust checkbox size */
+    width: 15px;
+}
+
+.params-table th:first-child,
+.params-table td:first-child {
+    text-align: center;
+    width: 3%;
+}
+
+.params-table th:nth-child(2),
+.params-table td:nth-child(2) {
+    width: 20%;
+}
+
+.params-table th:nth-child(3),
+.params-table td:nth-child(3) {
+    width: 30%;
+}
+
+.params-table th:nth-child(4),
+.params-table td:nth-child(4) {
+    width: 40%;
+}
+
+.params-table th:nth-child(5),
+.params-table td:nth-child(5) {
+    text-align: center;
+    width: 7%;
+}
+
+/* Add Row button styling */
+.add-row-button {
+    display: inline-block;
+    margin-top: 8px; /* Add spacing from the table */
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #3b82f6; /* Tailwind blue-500 */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    text-align: center;
+}
+
+/* Hover effect for Add Row button */
+.add-row-button:hover {
+    background-color: #2563eb; /* Darker blue for hover */
+}
+
+/* Focus effect for better accessibility */
+.add-row-button:focus {
+    outline: 2px solid #2563eb; /* Highlight focus */
+    outline-offset: 2px;
+}
+
+/* Active effect for click feedback */
+.add-row-button:active {
+    transform: scale(0.98); /* Slight shrink for click effect */
+    background-color: #1e40af; /* Even darker blue */
+}
+
+/* Disabled Add Row button styling (if needed in the future) */
+.add-row-button:disabled {
+    background-color: #d1d5db; /* Tailwind gray-300 */
+    color: #9ca3af; /* Tailwind gray-400 */
+    cursor: not-allowed;
+}

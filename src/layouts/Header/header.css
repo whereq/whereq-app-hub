@@ -1,0 +1,49 @@
+.header {
+    flex-shrink: 0; /* Prevent shrinking */
+    position: fixed; /* Fix the header at the top */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10; /* Ensure it stays above other content */
+    height: 60px; /* Adjust header height */
+    background-color: #007bff; /* Optional: Header background */
+    color: white; /* Optional: Text color */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    margin-right: 0.5rem;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.app-title {
+    font-size: 0.875rem; /* text-sm */
+    font-weight: bold;
+    margin-left: 0.5rem;
+}
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Tailwind space-x-2 */
+}
+
+.header-nav a {
+    color: white;
+    transition: color 0.3s;
+}
+
+.header-nav a:hover {
+    color: #d1d5db; /* Tailwind gray-300 */
+}
+
+.app-launcher {
+    display: flex;
+    align-items: center;
+    margin: 0; /* Remove additional margin */
+}

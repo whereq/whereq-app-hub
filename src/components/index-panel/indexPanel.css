@@ -1,0 +1,207 @@
+.index-panel {
+    overflow: hidden;
+    font-size: 0.75rem; /* Tailwind text-xs */
+    display: flex;
+    flex-direction: column;
+    background-color: #f3f4f6; /* Tailwind gray-100 */
+}
+
+.index-panel .function-bar {
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Tailwind space-x-2 */
+}
+
+.index-panel .add-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #374151; /* Tailwind gray-700 */
+    transition: color 0.2s;
+}
+
+.index-panel .add-button:hover {
+    color: #1d4ed8; /* Tailwind blue-700 */
+}
+
+.index-panel .filter-input {
+    flex-grow: 1;
+    padding: 0.25rem;
+    border: 1px solid #d1d5db; /* Tailwind gray-300 */
+    border-radius: 0.25rem;
+    font-size: 0.75rem; /* Tailwind text-xs */
+    outline: none;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.index-panel .filter-input:focus {
+    border-color: #1d4ed8; /* Tailwind blue-700 */
+    box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.2); /* Tailwind blue focus shadow */
+}
+
+/* Top Category */
+.index-panel .top-category{
+    margin: 0;
+    padding: 0;
+    padding-left: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    text-align: left;
+    font-weight: bold;
+    color: #374151; /* Tailwind gray-700 */
+}
+
+.index-panel .top-category-text {
+    font-weight: 500; /* Medium weight for a cleaner look */
+    color: #374151; /* Tailwind gray-700 for sharpness */
+    font-size: 0.75rem; /* Tailwind text-sm for better readability */
+}
+
+.index-panel .panel-index-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+}
+
+.index-panel .index-item {
+    margin-bottom: 0.5rem;
+}
+
+.index-panel .index-header {
+    margin: 0;
+    padding: 0rem;
+    padding-left: 1.0rem;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    text-align: left;
+    font-weight: bold;
+    color: #374151; /* Tailwind gray-700 */
+}
+
+.index-panel .index-header:hover {
+    background-color: #f3f4f6; /* Tailwind gray-200 */
+}
+
+.index-panel .index-header.active {
+    background-color: #e5e7eb; /* Tailwind gray-100 */
+    color: #1d4ed8; /* Tailwind blue-700 */
+}
+
+.index-panel .leaf-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    padding-left: 2rem;
+}
+
+.index-panel .leaf-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    text-align: left;
+}
+
+.index-panel .leaf-item:hover {
+    background-color: #f3f4f6; /* Tailwind gray-200 */
+}
+
+.index-panel .leaf-item.selected {
+    background-color: #e0f7fa;
+    font-weight: bold;
+}
+
+
+.index-panel .http-method {
+    font-weight: bold;
+    margin-right: 0.3rem;
+    padding: 0;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.index-panel .http-method.get {
+    color: #059669; /* Tailwind green-600 */
+}
+
+.index-panel .http-method.post {
+    color: #1d4ed8; /* Tailwind blue-700 */
+}
+
+.index-panel .http-method.put {
+    color: #f59e0b; /* Tailwind yellow-500 */
+}
+
+.index-panel .http-method.delete {
+    color: #ef4444; /* Tailwind red-500 */
+}
+
+.index-panel .request-name {
+    flex-grow: 1;
+}
+
+.index-panel .ellipsis-icon {
+    color: #9ca3af; /* Tailwind gray-400 */
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.index-panel .ellipsis-icon:hover {
+    color: #374151; /* Tailwind gray-700 */
+}
+
+/* Style for the resize handle on the right edge */
+.resize-handle-right {
+    width: 4px;
+    background-color: transparent; /* Default color */
+    transition: background-color 0.2s ease;
+}
+
+/* Highlight color on hover */
+.resize-handle-right:hover {
+    background-color: #bfdbfe; /* Tailwind blue-200 */
+}
+/* Highlight when resizing is active */
+.index-panel.resizing .resize-handle-right {
+    background-color: #bfdbfe; /* Keep the highlight during resizing */
+}
+
+.chevron-icon {
+    margin-right: 6px; /* Adds a small margin between arrow and text */
+}
+
+.index-item {
+    padding-left: 16px; /* Indents the second-level nodes */
+}
+
+/* Category Name */
+.index-panel .category-text {
+    font-weight: 500; /* Medium weight for a cleaner look */
+    color: #374151; /* Tailwind gray-700 for sharpness */
+    font-size: 0.75rem; /* Tailwind text-sm for better readability */
+}
+
+/* Index Name */
+.index-panel .index-text {
+    font-weight: 400; /* Normal weight for a less heavy appearance */
+    color: #4b5563; /* Tailwind gray-600 for a slightly lighter tone */
+    font-size: 0.75rem; /* Tailwind text-sm for consistency */
+}
+
+.selected-highlight {
+    background-color: #cdd9e3; /* Light blue */
+    border-left: 4px solid #0078d4; /* Accent */
+}
+
+.folder-icon {
+    margin-right: 6px; /* Adds spacing between the folder icon and text */
+    color: #1d4ed8; /* Tailwind blue-700 */
+    font-size: 0.875rem; /* Tailwind text-sm for consistency */
+}

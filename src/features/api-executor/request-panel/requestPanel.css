@@ -1,0 +1,37 @@
+.request-panel {
+    overflow: hidden;
+    position: relative;
+    height: 30%;
+}
+
+.request-tabs {
+    display: flex;
+    border-bottom: 1px solid #d1d5db;
+    background: #f9fafb;
+    border: none;
+}
+
+.request-tab {
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    border: none;
+    background: transparent;
+    border-bottom: 1px solid transparent;
+}
+
+.request-tab.active {
+    font-weight: bold;
+    border-bottom: 1px solid #1d4ed8;
+    color: #1d4ed8;
+}
+
+.request-tab:hover {
+    background-color: #f1f5f9;
+}
+
+.request-tab-content {
+    border: none;
+    background: #fff;
+    height: 100%;
+}

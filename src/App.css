@@ -1,0 +1,42 @@
+/* Root container */
+#root {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0; /* Remove unnecessary padding */
+  text-align: center;
+  border: none; /* Remove default border */
+}
+
+/* Main Area */
+main {
+  flex-grow: 1; /* Allow the main area to take up remaining space */
+  margin-top: 60px; /* Offset for the header height */
+  margin-bottom: 50px; /* Offset for the footer height */
+  /* overflow-y: auto; Add vertical scroll to the main content */
+  overflow: hidden;
+  padding: 0; /* Remove extra padding */
+  background-color: #f8fafc; /* Optional: Background color */
+  height: calc(100vh - 110px); /* Total height minus header and footer */
+  display: flex; /* Optional: Use flexbox for layout inside main */
+  flex-direction: column; /* Stack children vertically */
+}
+
+/* Miscellaneous */
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}

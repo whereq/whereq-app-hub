@@ -1,0 +1,67 @@
+.url-panel {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    border: none;
+}
+
+.endpoint-input {
+    height: 100%;
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    padding-left: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.send-button {
+    margin: 0;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.send-button:hover {
+    background-color: #2563eb; /* Darker blue for hover */
+}
+
+/* Style for placeholder text in the input box */
+.endpoint-input::placeholder {
+    color: #9ca3af; /* Tailwind gray-400 */
+    font-style: italic;
+}
+
+/* Dim style for the placeholder */
+.endpoint-input.placeholder::placeholder {
+    color: #9ca3af; /* Tailwind gray-400 */
+    font-style: italic;
+    opacity: 0.5; /* Make it dimmer */
+}
+
+/* Normal input text style */
+.endpoint-input {
+    color: #111827; /* Tailwind gray-900 */
+    font-size: 0.875rem; /* Tailwind text-sm */
+}
+
+/* Focus behavior */
+.endpoint-input:focus {
+    outline: none;
+    color: #111827; /* Ensure text is visible when focused */
+    background-color: #ffffff; /* Default background */
+    caret-color: #2563eb; /* Tailwind blue-600 */
+}
+
+/* Disabled button styling */
+.send-button-disabled {
+    background-color: #d1d5db; /* Tailwind gray-300 */
+    cursor: not-allowed;
+    color: #9ca3af; /* Tailwind gray-400 */
+    pointer-events: none; /* Prevent interaction */
+}
+
+/* Active button styling */
+.send-button:not(.send-button-disabled):hover {
+    background-color: #2563eb; /* Darker blue for hover */
+    transition: background-color 0.3s;
+}

@@ -1,0 +1,25 @@
+.cookies-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.875rem;
+    text-align: left;
+}
+
+.cookies-table th,
+.cookies-table td {
+    border: 1px solid #d1d5db;
+    padding: 0.5rem;
+}
+
+.cookies-table th {
+    background-color: #f9fafb;
+    font-weight: bold;
+}
+
+.no-cookies-message {
+    padding: 1rem;
+    color: #6b7280; /* Tailwind gray-500 */
+    font-size: 0.875rem;
+    text-align: center;
+}

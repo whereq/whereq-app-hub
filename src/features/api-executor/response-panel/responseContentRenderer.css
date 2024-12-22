@@ -1,0 +1,240 @@
+.response-body {
+    background: #f9fafb; /* Keep a light background */
+    font-family: monospace; /* Default font for preformatted text */
+    margin: 0;
+    padding: 0.5rem; /* Add consistent padding */
+    overflow: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: left;
+    color: #333; /* Default text color */
+}
+
+/* Markdown-specific styling */
+.markdown-content {
+    font-family: monospace; 
+    color: #333;
+    line-height: 0.5;
+    padding: 1rem;
+    padding-left: 0.5rem;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Markdown headers */
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+    margin: 0;
+    margin-top: 0.5rem;
+    color: #1d4ed8; /* Tailwind blue-700 */
+    font-weight: bold;
+}
+
+/* Lists */
+.markdown-content ul,
+.markdown-content ol {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.markdown-content li {
+    margin: 0;
+}
+
+/* Tables */
+.markdown-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+}
+
+.markdown-content th,
+.markdown-content td {
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    text-align: left;
+}
+
+.markdown-content th {
+    background-color: #f1f5f9; /* Light gray */
+    font-weight: bold;
+}
+
+/* Inline code */
+.markdown-content code {
+    background: #f3f4f6; /* Light gray */
+    color: #d97706; /* Tailwind amber-600 */
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: "Courier New", monospace;
+}
+
+/* Code blocks */
+.markdown-content pre {
+    background: #1e293b; /* Tailwind slate-800 */
+    color: #f8fafc; /* Tailwind slate-50 */
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+/* Blockquotes */
+.markdown-content blockquote {
+    border-left: 4px solid #1d4ed8; /* Tailwind blue-700 */
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    background: #f3f4f6; /* Light gray */
+    color: #1e293b; /* Tailwind slate-800 */
+    font-style: italic;
+}
+
+/* Links */
+.markdown-content a {
+    color: #1d4ed8; /* Tailwind blue-700 */
+    text-decoration: underline;
+}
+
+/* Container for syntax highlighting */
+.syntax-highlighter-container {
+    font-family: "Fira Code", monospace;
+    background: #282c34; /* oneDark background */
+    color: #abb2bf; /* Default text color from oneDark */
+    padding: 0.5rem;
+    border-radius: 4px;
+    overflow: auto;
+    margin: 0.5rem 0;
+}
+
+/* Prevent global styles from affecting SyntaxHighlighter */
+.syntax-highlighter-container pre {
+    background: inherit !important; /* Match the container background */
+    color: inherit !important;
+    border: none;
+    margin: 0;
+}
+
+/* Ensure inline code matches oneDark */
+.inline-code {
+    background: #2c313a; /* oneDark inline code background */
+    color: #e06c75; /* Inline code text color */
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: "Fira Code", monospace;
+}
+
+/* Adjust Markdown spacing */
+.markdown-content p {
+    margin: 0.5rem 0; /* Reduce paragraph spacing */
+    line-height: 0.5; /* Adjust line spacing */
+}
+
+.markdown-content h1, .markdown-content h2, .markdown-content h3 {
+    margin: 1rem 0 0.5rem;
+    font-weight: bold;
+}
+
+/* Apply dark theme to the entire Markdown content */
+.markdown-content.dark-theme {
+    line-height: 0.5; /* Adjust line spacing */
+    background-color: #1e1e1e; /* Dark background */
+    color: #d4d4d4; /* Light text color */
+    margin: 0;
+    padding: 0; 
+    padding-left: 1rem; /* Add padding for better readability */
+    overflow-wrap: break-word;
+}
+
+/* Headings */
+.markdown-content.dark-theme h1,
+.markdown-content.dark-theme h2,
+.markdown-content.dark-theme h3,
+.markdown-content.dark-theme h4,
+.markdown-content.dark-theme h5,
+.markdown-content.dark-theme h6 {
+    line-height: 0.5; /* Adjust line spacing */
+    color: #a9b084; /* Slightly brighter color for headings */
+}
+
+/* Links */
+.markdown-content.dark-theme a {
+    color: #569cd6; /* Bright blue for links */
+    text-decoration: none;
+}
+
+.markdown-content.dark-theme a:hover {
+    text-decoration: underline;
+}
+
+/* Blockquote */
+.markdown-content.dark-theme blockquote {
+    color: #6a9955;
+    border-left: 4px solid #d7ba7d; /* Yellowish border for blockquote */
+    margin: 0;
+    padding: 0 1rem;
+    font-style: italic;
+}
+
+/* Lists */
+.markdown-content.dark-theme ul,
+.markdown-content.dark-theme ol {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.markdown-content.dark-theme li {
+    margin: 0.25rem 0;
+}
+
+/* Tables */
+.markdown-content.dark-theme table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+}
+
+.markdown-content.dark-theme th,
+.markdown-content.dark-theme td {
+    border: 1px solid #3c3c3c; /* Table borders */
+    padding: 0.5rem;
+    text-align: left;
+}
+
+.markdown-content.dark-theme th {
+    background-color: #252526;
+    color: #d4d4d4;
+}
+
+/* Code (inline) */
+.markdown-content.dark-theme code {
+    background-color: #2d2d2d;
+    color: #dcdcaa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 0.95em;
+}
+
+/* Preformatted Code Block */
+.markdown-content.dark-theme pre {
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    padding: 1rem;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-size: 0.95em;
+}
+
+/* Horizontal Rule */
+.markdown-content.dark-theme hr {
+    border: 0;
+    border-top: 1px solid #3c3c3c;
+    margin: 1rem 0;
+}

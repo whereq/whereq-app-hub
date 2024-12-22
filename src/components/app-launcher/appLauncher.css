@@ -1,0 +1,74 @@
+/* Launcher Button */
+.launcher-button {
+  width: 1.5rem; /* Tailwind w-8 */
+  height: 1.5rem; /* Tailwind h-8 */
+  background-color: #f3f4f6; /* Tailwind gray-200 */
+  border-radius: 50%; /* Makes the button round */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.launcher-button:hover {
+  background-color: #e5e7eb; /* Tailwind gray-300 */
+}
+
+/* Dropdown Menu */
+.menu-dropdown {
+  width: 16rem; /* Tailwind w-64 */
+  background-color: #ffffff; /* White background */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  border-radius: 0.5rem; /* Rounded corners */
+  z-index: 50; /* Ensure it stays above other elements */
+  top: 100%; /* Directly below the button */
+  left: 0; /* Align left by default */
+  transform: translateY(4px); /* Adds small spacing */
+  overflow: hidden;
+}
+
+/* App Item */
+.app-item {
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+.app-item:hover {
+  background-color: #f1f5f9; /* Light gray background on hover */
+}
+
+/* App Name */
+.app-name {
+  width: 100%;
+  white-space: nowrap; /* Prevent text wrapping */
+  overflow: hidden; /* Hide overflow text */
+  text-overflow: ellipsis; /* Show ellipsis for overflow text */
+}
+
+/* Tooltip for Full App Name */
+.app-name-tooltip {
+  top: calc(100% + 0.5rem); /* Position below the app icon */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #0a4f95; /* Light background */
+  color: #d8e763; /* Dark gray text */
+  padding: 0.25rem 0.5rem; /* Padding for tooltip */
+  border-radius: 0.25rem; /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: opacity 0.2s;
+  font-size: 0.75rem; /* Smaller text size */
+  white-space: nowrap; /* Prevent tooltip text from wrapping */
+}
+
+.app-item:hover .app-name-tooltip {
+  opacity: 1; /* Show tooltip on hover */
+  pointer-events: auto; /* Enable tooltip interaction */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .menu-dropdown {
+    width: 12rem; /* Reduce width for smaller screens */
+  }
+}

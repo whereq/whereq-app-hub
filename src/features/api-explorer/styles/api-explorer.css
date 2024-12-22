@@ -1,0 +1,12 @@
+/* General styles for the CatFact page */
+.flex {
+    display: flex;
+}
+
+.h-screen {
+    height: 100%;
+}
+
+.bg-white {
+    background-color: #ffffff;
+}

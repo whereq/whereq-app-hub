@@ -1,0 +1,101 @@
+.response-panel {
+    flex: 1;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+}
+
+.response-top-bar {
+    height: 30px;
+    font-size: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0.5rem;
+}
+
+.response-tabs {
+    display: flex;
+    border-bottom: 1px solid #d1d5db;
+    background: #f9fafb;
+    border: none;
+    flex-grow: 1; /* Push the details section to the right */
+}
+
+.response-tab-content {
+    flex: 1; /* Take the remaining height of the parent */
+    overflow-y: auto;
+    border: none;
+    padding: 0;
+    padding-bottom: 0;
+    background: transparent;
+}
+
+.response-tab {
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    border: none;
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    margin-right: 1rem; /* Add spacing between tabs */
+}
+
+.response-tab.active {
+    font-weight: bold;
+    border-bottom: 1px solid #1d4ed8;
+    color: #1d4ed8;
+}
+
+.response-tab:hover {
+    background-color: #f1f5f9;
+}
+
+/* Style for the resize handle on the right edge */
+.resize-handle-top {
+    width: 4px;
+    background-color: transparent; /* Default color */
+    transition: background-color 0.2s ease;
+}
+
+/* Highlight color on hover */
+.resize-handle-top:hover {
+    background-color: #bfdbfe; /* Tailwind blue-200 */
+}
+/* Highlight when resizing is active */
+.response-panel.resizing .resize-handle-top {
+    background-color: #bfdbfe; /* Keep the highlight during resizing */
+}
+
+.response-button-details {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Add space between the text and icons */
+}
+
+.icon-group {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem; /* Control spacing between icons */
+}
+
+.response-icon {
+    font-size: 1rem; /* Ensure consistent icon size */
+    color: #1d4ed8; /* Tailwind blue-600 */
+}
+
+.response-icon:hover {
+    color: #2563eb; /* Tailwind blue-700 */
+}
+
+.copy-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+}
+
+.copy-button:hover {
+    color: #2563eb; /* Darker Tailwind Blue */
+}
