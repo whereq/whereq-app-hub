@@ -1,0 +1,141 @@
+- name: Animal
+  categories:
+    - name: Cat Information
+      restfulEndpointGroups:
+        - name: Cat Fact Ninja
+          restfulEndpoints:
+            - title: Cat Breeds
+              url: https://catfact.ninja/breeds
+              method: GET
+              params:
+                limit: "10"
+              headers:
+                Content-Type: application/json
+              tags: [Animal, Cat]
+              categories: [Animal, Cat]
+            - title: Cat Facts
+              url: https://catfact.ninja/facts
+              method: GET
+              params:
+                max_length: ""
+                limit: "10"
+              headers:
+                Content-Type: application/json
+              tags: [Cat, Animal]
+              categories: [Animal, Cat]
+    - name: Dog Information
+      restfulEndpointGroups:
+        - name: Dog Breeds
+          restfulEndpoints:
+            - title: Dog Breeds
+              url: https://dog.ceo/api/breeds/list/all
+              method: GET
+              headers:
+                Content-Type: application/json
+              tags: [Dog, Animal]
+              categories: [Animal, Dog]
+- name: Animation
+  categories:
+    - name: Ghibli Studio
+      restfulEndpointGroups:
+        - name: Ghibli Endpoints
+          restfulEndpoints:
+            - title: Films
+              url: https://ghibli.rest/films
+              method: GET
+              params: {}
+              headers:
+                Content-Type: application/json
+              tags: [films, animation]
+              categories: [Animation, Ghibli Studio]
+            - title: Film
+              url: https://ghibli.rest/films
+              method: GET
+              params:
+                id: d6bd6efc-37b2-4c40-b092-367cea8c88fe
+              headers:
+                Content-Type: application/json
+              tags: [film, animation]
+              categories: [Animation, Ghibli Studio]
+            - title: Locations
+              url: https://ghibli.rest/locations
+              method: GET
+              params: {}
+              headers:
+                Content-Type: application/json
+              tags: [locations, animation]
+              categories: [Animation, Ghibli Studio]
+            - title: Location
+              url: https://ghibli.rest/locations
+              method: GET
+              params:
+                id: 11014596-71b0-4b3e-b8c0-1c4b15f28b9a
+              headers:
+                Content-Type: application/json
+              tags: [location, animation]
+              categories: [Animation, Ghibli Studio]
+            - title: People
+              url: https://ghibli.rest/people
+              method: GET
+              params: {}
+              headers:
+                Content-Type: application/json
+              tags: [people, animation]
+              categories: [Animation, Ghibli Studio]
+            - title: People by ID
+              url: https://ghibli.rest/locations
+              method: GET
+              params:
+                id: 267649ac-fb1b-11eb-9a03-0242ac130003
+              headers:
+                Content-Type: application/json
+              tags: [people, animation]
+              categories: [Animation, Ghibli Studio]
+            - title: Species
+              url: https://ghibli.rest/species
+              method: GET
+              params: {}
+              headers:
+                Content-Type: application/json
+              tags: [species, animation]
+              categories: [Animation, Ghibli Studio]
+            - title: Species by ID
+              url: https://ghibli.rest/species
+              method: GET
+              params:
+                id: af3910a6-429f-4c74-9ad5-dfe1c4aa04f2
+              headers:
+                Content-Type: application/json
+              tags: [species, animation]
+              categories: [Animation, Ghibli Studio]
+            - title: Vehicles
+              url: https://ghibli.rest/vehicles
+              method: GET
+              params: {}
+              headers:
+                Content-Type: application/json
+              tags: [vehicles, animation]
+              categories: [Animation, Ghibli Studio]
+            - title: Vehicle
+              url: https://ghibli.rest/vehicles
+              method: GET
+              params:
+                id: 4e09b023-f650-4747-9ab9-eacf14540cfb
+              headers:
+                Content-Type: application/json
+              tags: [vehicle, animation]
+              categories: [Animation, Ghibli Studio]
+
+- name: Others
+  categories:
+    - name: Uncategorized
+      restfulEndpointGroups:
+        - name: My IP Address
+          restfulEndpoints:
+            - title: My IP Address
+              url: https://api.ipify.org/?format=json
+              method: GET
+              headers:
+                Content-Type: application/json
+              tags: [Utility, Others]
+              categories: [Others, Utility]
