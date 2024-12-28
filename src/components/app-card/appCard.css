@@ -1,0 +1,51 @@
+/* General AppCard styles */
+.app-card {
+  display: block;
+  text-decoration: none;
+  border: 1px solid #d1d5db; /* Tailwind gray-300 */
+  border-radius: 0.5rem; /* Rounded corners */
+  padding: 1rem;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.app-card:hover {
+  transform: translateY(-4px); /* Hover effect */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+}
+
+.app-card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%; /* Stretch to ensure vertical alignment */
+}
+
+.app-card-icon {
+  color: #3b82f6; /* Tailwind blue-500 */
+  font-size: 2.5rem; /* Tailwind text-4xl */
+  margin-bottom: 1rem;
+}
+
+.app-card-title {
+  font-size: 1.25rem; /* Tailwind text-xl */
+  font-weight: 700; /* Tailwind font-bold */
+  color: #1f2937; /* Tailwind gray-800 */
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.app-card-description {
+  color: #6b7280; /* Tailwind gray-600 */
+  text-align: center;
+  font-size: 0.875rem; /* Tailwind text-sm */
+}
+
+/* Maintain a 5:3 aspect ratio for cards */
+.app-card {
+  aspect-ratio: 5 / 3;
+  display: flex;
+}

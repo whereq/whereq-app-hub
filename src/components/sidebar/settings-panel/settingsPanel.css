@@ -1,0 +1,200 @@
+.setting-panel {
+    position: fixed;
+    top: 60px; /* Start below the main header */
+    left: 3rem; /* Start right of the Sidebar */
+    width: calc(100% - 3rem); /* Occupy the remaining width of the screen */
+    height: calc(100% - 60px - 50px); /* Adjust for header (60px) and footer (50px) */
+    background: white;
+    display: flex;
+    flex-direction: column; /* Stack header and body vertically */
+    z-index: 10;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add some shadow for better visibility */
+    border: 1px solid #d1d5db; /* Add border for consistency */
+}
+
+.setting-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background: #f9fafb; /* Light gray background */
+    border-bottom: 1px solid #ddd;
+    z-index: 1; /* Ensure the header stays above the content */
+}
+
+.setting-panel-header .right-buttons {
+    display: flex;
+    gap: 10px; /* Space between Revert, Save, and Close buttons */
+    align-items: center;
+}
+
+.setting-panel-header .right-buttons button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #4b5563; /* Dark gray color */
+}
+
+.setting-panel-header .right-buttons button:hover {
+    color: #1e40af; /* Dark blue on hover */
+}
+
+.setting-panel-body {
+    flex: 1; /* Take the remaining height of the panel */
+    overflow-y: auto; /* Allow vertical scrolling */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.settings-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0; /* Ensure no margin around the table */
+    box-sizing: border-box; /* Ensure padding doesn't affect table width */
+}
+
+.settings-table th,
+.settings-table td {
+    border: 1px solid #d1d5db; /* Light gray border */
+    padding: 0 4px; /* Removed padding to align input boxes */
+    text-align: left;
+    height: 30px; /* Reduced row height */
+}
+
+.settings-table th {
+    font-size: 0.75rem;
+    color: #4b5563; /* Dark gray text */
+    background-color: #f9fafb; /* Light gray background */
+    line-height: 30px; /* Center-align header text vertically */
+}
+
+.settings-table td input[type="text"],
+.settings-table td input[type="checkbox"] {
+    width: 100%;
+    height: 100%;
+    border: none; /* Remove default input borders */
+    font-size: 0.75rem;
+    box-sizing: border-box; /* Ensure no overflow */
+    outline: none; /* Remove focus outline */
+    background: transparent; /* Match the table cell background */
+}
+
+.settings-table td input[type="text"]:focus {
+    border: 1px solid #2563eb; /* Add a focus border for better usability */
+    background: #f1f5f9; /* Highlight the focused input */
+}
+
+.settings-table td input[type="checkbox"] {
+    display: block;
+    margin: auto;
+    height: 15px; /* Adjust checkbox size */
+    width: 15px;
+}
+
+.settings-table th:first-child,
+.settings-table td:first-child {
+    text-align: center;
+    width: 3%;
+}
+
+.settings-table th:nth-child(2),
+.settings-table td:nth-child(2) {
+    width: 20%;
+}
+
+.settings-table th:nth-child(3),
+.settings-table td:nth-child(3) {
+    width: 30%;
+}
+
+.settings-table th:nth-child(4),
+.settings-table td:nth-child(4) {
+    width: 40%;
+}
+
+/* Read-only input styling */
+.readonly-input {
+    background: #f0f0f0; /* Light gray background for read-only inputs */
+    border: none;
+    pointer-events: none; /* Disable pointer events */
+    color: #6b7280; /* Slightly darker text for read-only inputs */
+}
+
+.close-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #4b5563; /* Dark gray color */
+}
+
+.close-button:hover {
+    color: #1e40af; /* Dark blue on hover */
+}
+
+/* Modal container */
+.custom-modal {
+    width: 500px;
+    padding: 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    font-family: Arial, sans-serif;
+}
+
+/* Modal title bar */
+.custom-modal-title-bar {
+    background-color: #f4f4f4;
+    padding: 10px 16px;
+    font-size: 16px;
+    font-weight: bold;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: center;
+}
+
+/* Modal content */
+.custom-modal-content {
+    padding: 16px;
+    font-size: 14px;
+    color: #555555;
+    line-height: 1.6;
+}
+
+/* Modal button container */
+.custom-modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 10px 16px;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Modal button */
+.custom-modal-button {
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.custom-modal-button.ok {
+    background-color: #007bff;
+    color: white;
+}
+
+.custom-modal-button.ok:hover {
+    background-color: #0056b3;
+}
+
+.custom-modal-button.cancel {
+    background-color: #e0e0e0;
+    color: #333333;
+}
+
+.custom-modal-button.cancel:hover {
+    background-color: #d6d6d6;
+}
