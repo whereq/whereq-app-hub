@@ -18,4 +18,13 @@ export default defineConfig({
   optimizeDeps: {
     include: ['mathjax-full']
   },
+  server: {
+    proxy: {
+      '/realms/whereq': {
+        target: 'https://www.keytomarvel.com',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
+  }
 })

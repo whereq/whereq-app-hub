@@ -1,36 +1,46 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { useEffect, useState } from "react";
+import { AuthContext } from "@contexts/AuthContextInstance";
+import KeycloakService from "@services/keycloak";
+import type { AuthContextType } from "@contexts/AuthContextTypes";
 
-interface AuthContextType {
-  isAuthenticated: boolean;
-  user: { name: string; profilePicture: string } | null;
-  signIn: (user: { name: string; profilePicture: string }) => void;
-  signOut: () => void;
-}
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [state, setState] = useState<Omit<AuthContextType, 'login' | 'logout' | 'register'>>({
+    isAuthenticated: false,
+    isLoading: true
+  });
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        const authenticated = await KeycloakService.init();
+        setState({
+          isAuthenticated: authenticated,
+          isLoading: false
+        });
+      } catch (error) {
+        console.error("Keycloak initialization failed:", error);
+        setState(prev => ({
+          ...prev,
+          isLoading: false
+        }));
+      }
+    };
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<{ name: string; profilePicture: string } | null>(null);
+    initializeAuth();
+  }, []);
 
-  const signIn = (user: { name: string; profilePicture: string }) => {
-    setUser(user);
-  };
-
-  const signOut = () => {
-    setUser(null);
+  const value: AuthContextType = {
+    ...state,
+    login: () => KeycloakService.getInstance().login(),
+    logout: () => KeycloakService.getInstance().logout(),
+    register: () => KeycloakService.getInstance().register()
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated: !!user, user, signIn, signOut }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
-};
+export { AuthContext } from "@contexts/AuthContextInstance";
