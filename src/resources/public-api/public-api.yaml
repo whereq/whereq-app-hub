@@ -654,15 +654,6 @@
                 Content-Type: application/json
               params:
                 ip: 170.151.163.193
-    - name: Logo
-      restfulEndpointGroups:
-        - name: Logo Information
-          restfulEndpoints:
-            - title: Logo
-              url: https://logo.clearbit.com/google.com
-              method: GET
-              headers:
-                Content-Type: application/json
 - name: Entertainment
   categories:
     - name: TVMaze
