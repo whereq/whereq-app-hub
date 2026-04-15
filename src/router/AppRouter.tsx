@@ -18,6 +18,7 @@ import PhysicsPage from "@features/physics/pages/PhysicsPage";
 import ChemistryPage from "@features/chemistry/pages/ChemistryPage";
 import PawsPage from "@features/paws/pages/PawsPage";
 import EventBoard from "@pages/event-board/EventBoard";
+import Profile from "@pages/profile/Profile";
 
 export const AppRouter = () => {
   return (
@@ -30,6 +31,7 @@ export const AppRouter = () => {
           <Route path="/event-board" element={<EventBoard/>} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/profile" element={<Profile/>} />
           <Route path="/signin" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/api-explorer" element={<ApiExplorerPage />} />

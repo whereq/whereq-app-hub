@@ -7,10 +7,19 @@ import { useNavigationStore } from "@store/store"; // Import the navigation stor
 import { routeTitles } from "@utils/utils";
 import { APPLICATION_NAME } from "@utils/constants";
 
+import { useAuth } from "@hooks/userAuth";
+import keycloak from "@services/keycloak";
+
 export const Header = () => {
   const { setAppDrawerOpen } = useAppStore();
   const { path } = useNavigationStore(); // Get the current path from the store
   const location = useLocation();
+
+  const { isAuthenticated } = useAuth(); // Get auth state
+
+    // Get user profile from Keycloak token
+  const userProfile = isAuthenticated ? keycloak.tokenParsed : null;
+  const avatarUrl = userProfile?.picture || userProfile?.avatar;
 
   // Determine the current feature title
   const currentTitle = routeTitles[location.pathname] || "";
@@ -93,14 +102,34 @@ export const Header = () => {
           <AppLauncher />
 
           <NavLink
-            to="/signin"
-            title="Sign In/Sign Up"
+            to={isAuthenticated ? "/profile" : "/signin"}
+            title={isAuthenticated ? "My Profile" : "Sign In/Sign Up"}
             className={({ isActive }) =>
               `hover:text-orange-400 transition-colors ${isActive ? "text-orange-400" : ""}`
             }
-            onClick={closeAppDrawer} // Close AppLauncher on click
+            onClick={closeAppDrawer}
           >
-            <FontAwesomeIcon icon={faUser} size="lg" />
+            {isAuthenticated ? (
+              avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt="Profile"
+                  className="w-6 h-6 rounded-full object-cover"
+                />
+              ) : (
+                <FontAwesomeIcon
+                  icon={faUser}
+                  size="lg"
+                  className="text-sky-700" // Changed color for authenticated users
+                />
+              )
+            ) : (
+              <FontAwesomeIcon
+                icon={faUser}
+                size="lg"
+                className="text-orange-300" // Original color for anonymous users
+              />
+            )}
           </NavLink>
         </nav>
       </div>
