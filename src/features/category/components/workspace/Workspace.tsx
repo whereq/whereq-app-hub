@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Resizable } from "re-resizable";
 
-import { useCategoryStore } from "@features/category/store/categoryStore";
-import { SectionType } from "@features/category/models/CategoryEnum";
-import { MyCategorySection } from "@features/category/components/workspace/MyCategorySection";
-import { WhereQCategorySection } from "@features/category/components/workspace/WhereQCategorySection";
+import { useCategoryStore } from "@/features/category/store/categoryStore";
+import { SectionType } from "@/features/category/models/CategoryEnum";
+import { MyCategorySection } from "@/features/category/components/workspace/MyCategorySection";
+import { WhereQCategorySection } from "@/features/category/components/workspace/WhereQCategorySection";
 
 
 export const Workspace = () => {

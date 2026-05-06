@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Sidebar } from "@features/paws/components/sidebar/Sidebar";
-import { SettingPanel } from "@features/paws/components/sidebar/settings-panel/SettingsPanel";
-import { Workspace } from "@features/paws/components/workspace/Workspace";
-import PageLayout from "@layouts/PageLayout";
-import Paws from "@features/paws/components/Paws";
-import { usePawsStore } from "@features/paws/store/pawsStore";
+import { Sidebar } from "@/features/paws/components/sidebar/Sidebar";
+import { SettingPanel } from "@/features/paws/components/sidebar/settings-panel/SettingsPanel";
+import { Workspace } from "@/features/paws/components/workspace/Workspace";
+import PageLayout from "@/layouts/PageLayout";
+import Paws from "@/features/paws/components/Paws";
+import { usePawsStore } from "@/features/paws/store/pawsStore";
 
 const PawsPage = () => {
     const { isWorkspaceVisible } = usePawsStore();

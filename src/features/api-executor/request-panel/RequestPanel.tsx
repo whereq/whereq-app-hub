@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { ParamsTab } from "@features/api-executor/request-panel/ParamsTab/ParamsTab";
-import { AuthorizationTab } from "@features/api-executor/request-panel/AuthorizationTab/AuthorizationTab";
-import { BodyTab } from "@features/api-executor/request-panel/BodyTab/BodyTab";
-import { SettingsTab } from "@features/api-executor/request-panel/SettingsTab/SettingsTab";
-import { CurlTab } from "@features/api-executor/request-panel/CurlTab/CurlTab";
-import { TAB_TYPES } from "src/utils/constants";
-import { RestfulEndpoint } from "@models/RestfulEndpoint";
+import { ParamsTab } from "@/features/api-executor/request-panel/ParamsTab/ParamsTab";
+import { AuthorizationTab } from "@/features/api-executor/request-panel/AuthorizationTab/AuthorizationTab";
+import { BodyTab } from "@/features/api-executor/request-panel/BodyTab/BodyTab";
+import { SettingsTab } from "@/features/api-executor/request-panel/SettingsTab/SettingsTab";
+import { CurlTab } from "@/features/api-executor/request-panel/CurlTab/CurlTab";
+import { TAB_TYPES } from "@/utils/constants";
+import { RestfulEndpoint } from "@/models/RestfulEndpoint";
 
 type RequestPanelProps = {
     restfulEndpoint?: RestfulEndpoint;

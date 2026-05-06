@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Resizable } from "re-resizable";
 
-import { useMathStore } from "@features/math/store/mathStore";
-import { SectionType } from "@features/math/models/MathEnum";
-import { AnimationSection } from "@features/math/components/workspace/AnimationSection";
-import { CalculatorSection } from "@features/math/components/workspace/CalculatorSection";
-import { FormulaCategorySection } from "@features/math/components/workspace/FormulaCategorySection";
-import { MathematicianSection } from "@features/math/components/workspace/MathematicianSection";
+import { useMathStore } from "@/features/math/store/mathStore";
+import { SectionType } from "@/features/math/models/MathEnum";
+import { AnimationSection } from "@/features/math/components/workspace/AnimationSection";
+import { CalculatorSection } from "@/features/math/components/workspace/CalculatorSection";
+import { FormulaCategorySection } from "@/features/math/components/workspace/FormulaCategorySection";
+import { MathematicianSection } from "@/features/math/components/workspace/MathematicianSection";
 
 
 export const Workspace = () => {

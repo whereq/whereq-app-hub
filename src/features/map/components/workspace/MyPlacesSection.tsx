@@ -1,9 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-import { useMapStore, usePlaceStore } from "@features/map/store/mapStore";
-import { handleCopy } from "@utils/utils";
-import { useExistingMap } from "@features/map/hooks/useMap";
-import { ENTRY_LIMITS } from "@features/map/utils/constants";
+import { useMapStore, usePlaceStore } from "@/features/map/store/mapStore";
+import { handleCopy } from "@/utils/utils";
+import { useExistingMap } from "@/features/map/hooks/useMap";
+import { ENTRY_LIMITS } from "@/features/map/utils/constants";
 
 export const MyPlacesSection = () => {
     const {

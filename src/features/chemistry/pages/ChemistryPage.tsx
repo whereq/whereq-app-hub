@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Sidebar } from "@features/chemistry/components/sidebar/Sidebar";
-import { SettingPanel } from "@features/chemistry/components/sidebar/settings-panel/SettingsPanel";
-import { Workspace } from "@features/chemistry/components/workspace/Workspace";
-import PageLayout from "@layouts/PageLayout";
-import Chemistry from "@features/chemistry/components/Chemistry";
-import { useChemistryStore } from "@features/chemistry/store/chemistryStore";
+import { Sidebar } from "@/features/chemistry/components/sidebar/Sidebar";
+import { SettingPanel } from "@/features/chemistry/components/sidebar/settings-panel/SettingsPanel";
+import { Workspace } from "@/features/chemistry/components/workspace/Workspace";
+import PageLayout from "@/layouts/PageLayout";
+import Chemistry from "@/features/chemistry/components/Chemistry";
+import { useChemistryStore } from "@/features/chemistry/store/chemistryStore";
 
 const ChemistryPage = () => {
     const { isWorkspaceVisible } = useChemistryStore();

@@ -7,7 +7,7 @@ import './styles/global.css'
 import Modal from 'react-modal'
 import App from './App.tsx'
 import { BrowserRouter } from 'react-router-dom'
-import { AuthProvider } from '@contexts/AuthContext.tsx'
+import { AuthProvider } from '@/contexts/AuthContext.tsx'
 import ErrorBoundary from './ErrorBoundary.tsx'
 
 // Polyfill for global object

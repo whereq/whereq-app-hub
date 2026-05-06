@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Sidebar } from "@features/tag/components/sidebar/Sidebar";
-import { SettingPanel } from "@features/tag/components/sidebar/settings-panel/SettingsPanel";
-import { Workspace } from "@features/tag/components/workspace/Workspace";
-import PageLayout from "@layouts/PageLayout";
-import Tag from "@features/tag/components/Tag";
-import { useTagStore } from "@features/tag/store/tagStore";
+import { Sidebar } from "@/features/tag/components/sidebar/Sidebar";
+import { SettingPanel } from "@/features/tag/components/sidebar/settings-panel/SettingsPanel";
+import { Workspace } from "@/features/tag/components/workspace/Workspace";
+import PageLayout from "@/layouts/PageLayout";
+import Tag from "@/features/tag/components/Tag";
+import { useTagStore } from "@/features/tag/store/tagStore";
 
 const TagPage = () => {
     const { isWorkspaceVisible } = useTagStore();

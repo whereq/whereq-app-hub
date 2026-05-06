@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { SectionType } from "@features/tools/models/ToolsEnum";
+import { SectionType } from "@/features/tools/models/ToolsEnum";
 
 interface ToolsStore {
     isWorkspaceVisible: boolean;

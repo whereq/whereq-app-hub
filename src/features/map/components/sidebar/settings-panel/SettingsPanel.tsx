@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faUndo, faSave } from "@fortawesome/free-solid-svg-icons";
-import CustomModal from "@components/modals/CustomModal"; // Import the reusable modal
-import { GLOBAL_SETTINGS } from "@utils/constants";
-import { API_KEY, GOOGLE_MAP_ID, MAP_LOCAL_STORAGE_KEYS } from "@features/map/utils/constants";
-import LocalStorageHelper from "@utils/localStorageHelper";
+import CustomModal from "@/components/modals/CustomModal"; // Import the reusable modal
+import { GLOBAL_SETTINGS } from "@/utils/constants";
+import { API_KEY, GOOGLE_MAP_ID, MAP_LOCAL_STORAGE_KEYS } from "@/features/map/utils/constants";
+import LocalStorageHelper from "@/utils/localStorageHelper";
 import React from "react";
 
 type Row = {

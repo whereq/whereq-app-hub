@@ -1,4 +1,4 @@
-import PageLayout from "@layouts/PageLayout";
+import PageLayout from "@/layouts/PageLayout";
 
 const About = () => {
   return (
@@ -130,21 +130,58 @@ const About = () => {
           </div>
 
           <hr className="my-4 border-gray-700" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-            <div className="bg-gray-700 p-4 rounded-md grid grid-cols-[10%_auto] grid-rows-2 gap-2 text-left">
-              <img src="https://whereq.github.io/images/logo/whereq-cc.png" alt="WhereQ - LLM" width="49" className="row-span-2" />
-              <p>WhereQ - LLM</p>
-              <a href="https://whereq.cc/" target="_blank" rel="noopener" className="text-blue-400 hover:underline">https://www.whereq.cc</a>
-            </div>
-            <div className="bg-gray-700 p-4 rounded-md grid grid-cols-[10%_auto] grid-rows-2 gap-2 text-left">
-              <img src="https://whereq.github.io/images/logo/whereq-com.png" alt="WhereQ - Real Estate 3.x" width="49" className="row-span-2" />
-              <p>WhereQ - Real Estate 3.x</p>
-              <a href="https://whereq.com/" target="_blank" rel="noopener" className="text-blue-400 hover:underline">https://www.whereq.com</a>
-            </div>
-            <div className="bg-gray-700 p-4 rounded-md grid grid-cols-[10%_auto] grid-rows-2 gap-2 text-left">
-              <img src="https://whereq.github.io/images/logo/key-to-marvel.png" alt="Key To Marvel" width="49" className="row-span-2" />
-              <p>Key To Marvel</p>
-              <a href="https://keytomarvel.com/" target="_blank" rel="noopener" className="text-blue-400 hover:underline">https://www.keytomarvel.com</a>
+          <h2 className="text-2xl font-bold mb-2 text-left">PROJECTS</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <a href="https://www.whereq.ca" target="_blank" rel="noopener" className="bg-gray-700 p-4 rounded-md grid grid-cols-[50px_1fr] gap-4 text-left hover:bg-gray-600 transition-colors">
+              <img src="https://whereq.github.io/images/logo/whereq-com.png" alt="WhereQ App Hub" width="49" className="row-span-2 self-center" />
+              <div>
+                <p className="font-bold text-blue-400">WhereQ App Hub</p>
+                <p className="text-sm">Your all-in-one decentralized web application hub — productivity, education & personal management, all in one place. No cloud storage, no tracking.</p>
+              </div>
+            </a>
+            <a href="https://www.keytomarvel.com" target="_blank" rel="noopener" className="bg-gray-700 p-4 rounded-md grid grid-cols-[50px_1fr] gap-4 text-left hover:bg-gray-600 transition-colors">
+              <img src="https://whereq.github.io/images/logo/key-to-marvel.png" alt="Key To Marvel" width="49" className="row-span-2 self-center" />
+              <div>
+                <p className="font-bold text-blue-400">Key To Marvel</p>
+                <p className="text-sm">Unified identity & access management platform</p>
+              </div>
+            </a>
+            <a href="https://www.flowdesk.top" target="_blank" rel="noopener" className="bg-gray-700 p-4 rounded-md grid grid-cols-[50px_1fr] gap-4 text-left hover:bg-gray-600 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" className="w-12 h-12 self-center">
+                <defs>
+                  <linearGradient id="fd-bgGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#0f172a"></stop>
+                    <stop offset="100%" stop-color="#1e3a5f"></stop>
+                  </linearGradient>
+                  <linearGradient id="fd-barGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#3b82f6"></stop>
+                    <stop offset="100%" stop-color="#06b6d4"></stop>
+                  </linearGradient>
+                  <linearGradient id="fd-flowGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#60a5fa"></stop>
+                    <stop offset="100%" stop-color="#22d3ee"></stop>
+                  </linearGradient>
+                </defs>
+                <rect width="128" height="128" rx="28" fill="url(#fd-bgGrad)"></rect>
+                <rect x="30" y="24" width="14" height="80" rx="7" fill="url(#fd-barGrad)"></rect>
+                <rect x="30" y="24" width="52" height="14" rx="7" fill="url(#fd-barGrad)"></rect>
+                <rect x="30" y="57" width="40" height="14" rx="7" fill="url(#fd-barGrad)"></rect>
+                <path d="M44 108 Q62 96 80 100 Q98 104 108 90" stroke="url(#fd-flowGrad)" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.6"></path>
+                <path d="M44 118 Q64 108 84 112 Q102 116 114 102" stroke="url(#fd-flowGrad)" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.35"></path>
+                <circle cx="80" cy="100" r="4" fill="#22d3ee" opacity="0.9"></circle>
+              </svg>
+              <div>
+                <p className="font-bold text-blue-400">FlowDesk</p>
+                <p className="text-sm">Deep, structured & intelligent stock analysis — powered by LLMs, built to help you go beyond surface-level thinking.</p>
+              </div>
+            </a>
+            <div className="bg-gray-700 p-4 rounded-md grid grid-cols-[50px_1fr] gap-4 text-left opacity-50">
+              <img src="https://whereq.github.io/images/logo/whereq-cc.png" alt="WhereQ — LLM" width="49" className="row-span-2 self-center" />
+              <div>
+                <p className="font-bold text-blue-400">WhereQ — LLM</p>
+                <p className="text-sm">AI/LLM integrated platform</p>
+                <p className="text-xs text-gray-400 mt-1">(Coming soon)</p>
+              </div>
             </div>
           </div>
         </div>

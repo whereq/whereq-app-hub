@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
-import { TAB_TYPES, PLACEHOLDERS, LABELS } from "@utils/constants";
-import LocalStorageHelper from "@utils/localStorageHelper";
+import { TAB_TYPES, PLACEHOLDERS, LABELS } from "@/utils/constants";
+import LocalStorageHelper from "@/utils/localStorageHelper";
 
 export const ParamsTab = ({
     restfulEndpointUrl,

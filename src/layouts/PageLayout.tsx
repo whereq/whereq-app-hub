@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
-import { AppEvent } from "@models/AppEvent";
-import LocalStorageHelper from "@utils/localStorageHelper";
-import { LOCAL_APP_EVENTS, LOCAL_STORAGE_KEYS } from "@utils/constants";
+import { AppEvent } from "@/models/AppEvent";
+import LocalStorageHelper from "@/utils/localStorageHelper";
+import { LOCAL_APP_EVENTS, LOCAL_STORAGE_KEYS } from "@/utils/constants";
 
 const PageLayout = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<AppEvent[]>([]);

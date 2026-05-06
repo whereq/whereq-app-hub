@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useMapStore, useOverlayStore, usePlaceStore } from "@features/map/store/mapStore";
+import { useMapStore, useOverlayStore, usePlaceStore } from "@/features/map/store/mapStore";
 import { v4 as uuidv4 } from 'uuid';
-import { MarkerIconType, MarkerAction } from "@features/map/models/MapEnum";
-import { updateMarkerIcon } from "@features/map/utils/mapHandlers";
-import { MapOverlay } from "@features/map/types/types";
-import { ENTRY_LIMITS } from "@features/map/utils/constants";
+import { MarkerIconType, MarkerAction } from "@/features/map/models/MapEnum";
+import { updateMarkerIcon } from "@/features/map/utils/mapHandlers";
+import { MapOverlay } from "@/features/map/types/types";
+import { ENTRY_LIMITS } from "@/features/map/utils/constants";
 
 const MarkerOverlayModal: React.FC = () => {
   const [activeTab, setActiveTab] = useState<MarkerAction>(MarkerAction.CUSTOMIZE);

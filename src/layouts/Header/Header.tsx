@@ -1,14 +1,14 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faChalkboard, faInfoCircle, faEnvelope, faUser } from "@fortawesome/free-solid-svg-icons";
 import { NavLink, useLocation } from "react-router-dom";
-import { AppLauncher } from "@components/app-launcher/AppLauncher";
-import { useAppStore } from "@store/store";
-import { useNavigationStore } from "@store/store"; // Import the navigation store
-import { routeTitles } from "@utils/utils";
-import { APPLICATION_NAME } from "@utils/constants";
+import { AppLauncher } from "@/components/app-launcher/AppLauncher";
+import { useAppStore } from "@/store/store";
+import { useNavigationStore } from "@/store/store"; // Import the navigation store
+import { routeTitles } from "@/utils/utils";
+import { APPLICATION_NAME } from "@/utils/constants";
 
-import { useAuth } from "@hooks/userAuth";
-import keycloak from "@services/keycloak";
+import { useAuth } from "@/hooks/userAuth";
+import keycloak from "@/services/keycloak";
 
 export const Header = () => {
   const { setAppDrawerOpen } = useAppStore();

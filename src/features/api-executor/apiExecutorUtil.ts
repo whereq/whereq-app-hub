@@ -1,9 +1,9 @@
-import { NetworkInformation } from "@models/NetworkInformation";
-import { ResponseCookie } from "@models/ResponseCookie";
-import { RestfulEndpoint } from "@models/RestfulEndpoint";
-import { CORS_HINT } from "@utils/constants";
-import { GLOBAL_SETTINGS_KEYS, LOCAL_SETTINGS_KEYS } from "@utils/constants";
-import { getLocalSettings } from "@utils/localSettingsLoader";
+import { NetworkInformation } from "@/models/NetworkInformation";
+import { ResponseCookie } from "@/models/ResponseCookie";
+import { RestfulEndpoint } from "@/models/RestfulEndpoint";
+import { CORS_HINT } from "@/utils/constants";
+import { GLOBAL_SETTINGS_KEYS, LOCAL_SETTINGS_KEYS } from "@/utils/constants";
+import { getLocalSettings } from "@/utils/localSettingsLoader";
 
 // Utility function to parse cookies from a Set-Cookie header
 export const parseCookies = (cookieHeader: string): ResponseCookie[] => {

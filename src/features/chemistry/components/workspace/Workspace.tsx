@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Resizable } from "re-resizable";
 
-import { useChemistryStore } from "@features/chemistry/store/chemistryStore";
-import { SectionType } from "@features/chemistry/models/ChemistryEnum";
-import { PeriodicTableSection } from "@features/chemistry/components/workspace/PeriodicTableSection";
-import { ExperimentsSection } from "@features/chemistry/components/workspace/ExperimentsSection";
+import { useChemistryStore } from "@/features/chemistry/store/chemistryStore";
+import { SectionType } from "@/features/chemistry/models/ChemistryEnum";
+import { PeriodicTableSection } from "@/features/chemistry/components/workspace/PeriodicTableSection";
+import { ExperimentsSection } from "@/features/chemistry/components/workspace/ExperimentsSection";
 
 
 export const Workspace = () => {

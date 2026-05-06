@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import Event from "@features/calendar/model/event";
+import Event from "@/features/calendar/model/event";
 
-import { CALENDAR_LOCAL_STORAGE_KEYS } from "@features/calendar/utils/constants";
-import LocalStorageHelper from "@utils/localStorageHelper";
+import { CALENDAR_LOCAL_STORAGE_KEYS } from "@/features/calendar/utils/constants";
+import LocalStorageHelper from "@/utils/localStorageHelper";
 
 interface EventStore {
   events: Event[];

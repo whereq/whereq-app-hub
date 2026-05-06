@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import logUtil from "@utils/logUtil";
+import logUtil from "@/utils/logUtil";
 
 interface DeleteMenuProps {
   map: google.maps.Map;

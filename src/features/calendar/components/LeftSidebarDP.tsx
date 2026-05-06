@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faChevronDown, faChevronUp, faCaretDown } from "@fortawesome/free-solid-svg-icons";
-import MiniCalendar from "@features/calendar/components/MiniCalendar";
-import EventCreationModalDP from "@features/calendar/components/EventCreationModalDP";
+import MiniCalendar from "@/features/calendar/components/MiniCalendar";
+import EventCreationModalDP from "@/features/calendar/components/EventCreationModalDP";
 
 const LeftSidebarDP: React.FC = () => {
   const [isMyCalendarsOpen, setIsMyCalendarsOpen] = useState(true);

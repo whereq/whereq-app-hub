@@ -1,6 +1,6 @@
 import axios from "axios";
 import yaml from "js-yaml";
-import { ElementModel } from "@features/chemistry/models/elementModel";
+import { ElementModel } from "@/features/chemistry/models/elementModel";
 
 import  CHEMISTRY_ELEMENT_YAML from "../resources/element.yaml?raw";
 

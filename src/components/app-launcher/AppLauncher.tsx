@@ -18,7 +18,7 @@ import { Link } from "react-router-dom";
 import { GiMaterialsScience, GiAcid  } from "react-icons/gi";
 import React from "react";
 
-import { useAppStore } from "@store/store";
+import { useAppStore } from "@/store/store";
 
 export const AppLauncher = () => {
   const launcherRef = useRef<HTMLDivElement | null>(null);

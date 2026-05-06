@@ -2,12 +2,12 @@ import { Resizable } from "re-resizable";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGlobe, faCopy, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
-import { ResponseCookie } from "@models/ResponseCookie";
-import { CookiesTab } from "@features/api-executor/response-panel/CookiesTab/CookiesTab";
-import { ResponseHeadersTab } from "@features/api-executor/response-panel/Headers/ResponseHeadersTab";
-import { ResponseContent } from "@models/ResponseContent";
+import { ResponseCookie } from "@/models/ResponseCookie";
+import { CookiesTab } from "@/features/api-executor/response-panel/CookiesTab/CookiesTab";
+import { ResponseHeadersTab } from "@/features/api-executor/response-panel/Headers/ResponseHeadersTab";
+import { ResponseContent } from "@/models/ResponseContent";
 import { ResponseContentRenderer } from "./ResponseContentRenderer";
-import { NetworkInformation } from "@models/NetworkInformation";
+import { NetworkInformation } from "@/models/NetworkInformation";
 import { NetworkInformationModal } from "./network-information-modal/NetworkInformationModal";
 
 export const ResponsePanel = ({

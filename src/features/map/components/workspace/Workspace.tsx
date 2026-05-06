@@ -3,13 +3,13 @@ import { Resizable } from "re-resizable";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
-import { useMapStore } from "@features/map/store/mapStore";
+import { useMapStore } from "@/features/map/store/mapStore";
 
-import { SectionType } from "@features/map/models/MapEnum";
+import { SectionType } from "@/features/map/models/MapEnum";
 
-import { MyPlacesSection } from "@features/map/components/workspace/MyPlacesSection"; 
-import { RecentSearchesSection } from "@features/map/components/workspace/RecentSearchesSection"; 
-import { MyMapSection } from "@features/map/components/workspace/MyMapSection"; 
+import { MyPlacesSection } from "@/features/map/components/workspace/MyPlacesSection"; 
+import { RecentSearchesSection } from "@/features/map/components/workspace/RecentSearchesSection"; 
+import { MyMapSection } from "@/features/map/components/workspace/MyMapSection"; 
 
 export const Workspace = () => {
     const [filterText, setFilterText] = useState("");

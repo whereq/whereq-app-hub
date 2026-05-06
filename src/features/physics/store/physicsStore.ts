@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { SectionType } from "@features/physics/models/PhysicsEnum";
+import { SectionType } from "@/features/physics/models/PhysicsEnum";
 
 interface PhysicsStore {
     isWorkspaceVisible: boolean;

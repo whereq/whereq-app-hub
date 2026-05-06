@@ -5,8 +5,8 @@ import {
     faCog,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { SectionType } from "@features/paws/models/PawsEnum";
-import { usePawsStore } from "@features/paws/store/pawsStore";
+import { SectionType } from "@/features/paws/models/PawsEnum";
+import { usePawsStore } from "@/features/paws/store/pawsStore";
 
 export const Sidebar = ({
     openSettings,

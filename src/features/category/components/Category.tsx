@@ -1,4 +1,4 @@
-import { useCategoryStore } from "@features/category/store/categoryStore";
+import { useCategoryStore } from "@/features/category/store/categoryStore";
 const Category = () => {
     const { activeSection } = useCategoryStore();
     return (

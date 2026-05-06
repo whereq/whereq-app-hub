@@ -9,7 +9,7 @@ import {
     faFolderClosed,
     faFolderOpen,
 } from "@fortawesome/free-solid-svg-icons";
-import { TopCategory } from "@models/EndpointCategory";
+import { TopCategory } from "@/models/EndpointCategory";
 
 export const IndexPanel = ({
     panels,

@@ -1,4 +1,4 @@
-import { ResponseCookie } from "@models/ResponseCookie";
+import { ResponseCookie } from "@/models/ResponseCookie";
 
 export const CookiesTab = ({ cookies }: { cookies: ResponseCookie[] }) => {
     if (!cookies || cookies.length === 0) {

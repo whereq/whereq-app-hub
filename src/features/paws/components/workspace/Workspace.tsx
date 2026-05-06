@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Resizable } from "re-resizable";
 
-import { usePawsStore } from "@features/paws/store/pawsStore";
-import { SectionType } from "@features/paws/models/PawsEnum";
-import { CatSection } from "@features/paws/components/workspace/CatSection";
-import { DogSection } from "@features/paws/components/workspace/DogSection";
+import { usePawsStore } from "@/features/paws/store/pawsStore";
+import { SectionType } from "@/features/paws/models/PawsEnum";
+import { CatSection } from "@/features/paws/components/workspace/CatSection";
+import { DogSection } from "@/features/paws/components/workspace/DogSection";
 
 
 export const Workspace = () => {

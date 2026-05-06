@@ -2,17 +2,17 @@ import React, { useState, useRef, useEffect } from "react";
 import { GoogleMap } from "@react-google-maps/api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMap, faTreeCity } from "@fortawesome/free-solid-svg-icons";
-import { MAP_CENTER, } from "@features/map/utils/constants";
-import MapDrawingManager from "@features/map/utils/MapDrawingManager";
-import MapTools from "@features/map/components/MapTools";
-import OverlayModal from "@features/map/components/OverlayModal";
-import { MapToolMode, OverlayModalMode } from "@features/map/models/MapEnum";
-import MarkerOverlayModal from "@features/map/components/MarkerOverlayModal";
-import { useOverlayManager } from "@features/map/hooks/useOverlayManager";
-import { useMapInitialization } from "@features/map/hooks/useMapInitialization";
-import { handleLayerSwitch } from "@features/map/utils/mapEventHandlers";
-import { calculateOverlayBounds } from "@features/map/utils/mapUtils";
-import { eventEmitter } from "@utils/eventEmitter";
+import { MAP_CENTER, } from "@/features/map/utils/constants";
+import MapDrawingManager from "@/features/map/utils/MapDrawingManager";
+import MapTools from "@/features/map/components/MapTools";
+import OverlayModal from "@/features/map/components/OverlayModal";
+import { MapToolMode, OverlayModalMode } from "@/features/map/models/MapEnum";
+import MarkerOverlayModal from "@/features/map/components/MarkerOverlayModal";
+import { useOverlayManager } from "@/features/map/hooks/useOverlayManager";
+import { useMapInitialization } from "@/features/map/hooks/useMapInitialization";
+import { handleLayerSwitch } from "@/features/map/utils/mapEventHandlers";
+import { calculateOverlayBounds } from "@/features/map/utils/mapUtils";
+import { eventEmitter } from "@/utils/eventEmitter";
 
 import {
     useHandleSelectedPlace,
@@ -20,12 +20,12 @@ import {
     useHandleClickedOverlay,
     useLoadGoogleMapId,
     useHandleAdvancedMarker
-} from "@features/map/hooks/useMap";
-import { useMapStore, usePlaceStore, useMapToolStore, useOverlayStore } from "@features/map/store/mapStore";
-import { useModalStore } from "@store/store";
-import CustomModal from "@components/modals/CustomModal";
-import { EVENT } from "@utils/constants";
-import { MapOverlay } from "@features/map/types/types";
+} from "@/features/map/hooks/useMap";
+import { useMapStore, usePlaceStore, useMapToolStore, useOverlayStore } from "@/features/map/store/mapStore";
+import { useModalStore } from "@/store/store";
+import CustomModal from "@/components/modals/CustomModal";
+import { EVENT } from "@/utils/constants";
+import { MapOverlay } from "@/features/map/types/types";
 
 const Maps: React.FC = () => {
     const [mapType, setMapType] = useState<"roadmap" | "satellite">("roadmap");

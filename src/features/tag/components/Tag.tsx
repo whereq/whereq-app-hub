@@ -1,4 +1,4 @@
-import { useTagStore } from "@features/tag/store/tagStore";
+import { useTagStore } from "@/features/tag/store/tagStore";
 const Tag = () => {
     const { activeSection } = useTagStore();
     return (

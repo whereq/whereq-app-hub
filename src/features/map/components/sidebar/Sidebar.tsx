@@ -7,8 +7,8 @@ import {
     faCog,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { useMapStore } from "@features/map/store/mapStore";
-import { SectionType } from "@features/map/models/MapEnum";
+import { useMapStore } from "@/features/map/store/mapStore";
+import { SectionType } from "@/features/map/models/MapEnum";
 
 export const Sidebar = ({
     openSettings,

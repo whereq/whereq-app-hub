@@ -1,6 +1,6 @@
-import { usePhysicsStore } from "@features/physics/store/physicsStore";
-import { SectionType } from "@features/physics/models/PhysicsEnum";
-import ConstantTable from "@features/physics/components/ConstantTable";
+import { usePhysicsStore } from "@/features/physics/store/physicsStore";
+import { SectionType } from "@/features/physics/models/PhysicsEnum";
+import ConstantTable from "@/features/physics/components/ConstantTable";
 const Physics = () => {
     const { activeSection } = usePhysicsStore();
     return (

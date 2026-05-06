@@ -7,10 +7,10 @@ import {
     faCog,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { SectionType } from "@features/tools/models/ToolsEnum";
-import { useToolsStore } from "@features/tools/store/toolsStore";
-import { useNavigationStore } from "@store/store"; // Import the navigation store
-import { Sub_Module_Path } from "@features/tools/utils/utils";
+import { SectionType } from "@/features/tools/models/ToolsEnum";
+import { useToolsStore } from "@/features/tools/store/toolsStore";
+import { useNavigationStore } from "@/store/store"; // Import the navigation store
+import { Sub_Module_Path } from "@/features/tools/utils/utils";
 
 export const Sidebar = ({
     openSettings,

@@ -5,8 +5,8 @@ import {
     getLocalSettings, 
     loadDefaultLocalSettings, 
     updateLocalSetting 
-} from "@utils/localSettingsLoader";
-import { RestfulEndpoint } from "@models/RestfulEndpoint";
+} from "@/utils/localSettingsLoader";
+import { RestfulEndpoint } from "@/models/RestfulEndpoint";
 
 type SettingsTabProps = {
     restfulEndpoint?: RestfulEndpoint;

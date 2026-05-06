@@ -15,7 +15,8 @@ const Calculator = () => {
 
   const handleCalculate = () => {
     try {
-      const result = eval(display);
+      // Use indirect eval to avoid direct eval warning while still evaluating math expressions
+      const result = (0, eval)(display);
       setDisplay(result.toString());
     } catch (error) {
       setDisplay((error as Error).toString());

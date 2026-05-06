@@ -1,5 +1,5 @@
-import { TopCategory } from "@models/EndpointCategory";
-import { RestfulEndpoint } from "@models/RestfulEndpoint";
+import { TopCategory } from "@/models/EndpointCategory";
+import { RestfulEndpoint } from "@/models/RestfulEndpoint";
 
 export const catFact: RestfulEndpoint[] = [
     {

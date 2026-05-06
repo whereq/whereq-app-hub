@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CatFact, CatFactsResponse, CatBreedsResponse } from "@features/api-explorer/public-api/cat-fact/models/catFact";
+import { CatFact, CatFactsResponse, CatBreedsResponse } from "@/features/api-explorer/public-api/cat-fact/models/catFact";
 
 // Fetch a list of cat breeds
 export const fetchCatBreeds = async (page: number): Promise<CatBreedsResponse> => {

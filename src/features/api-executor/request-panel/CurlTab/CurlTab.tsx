@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { RestfulEndpoint } from "@models/RestfulEndpoint";
+import { RestfulEndpoint } from "@/models/RestfulEndpoint";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { materialDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import LocalStorageHelper from "@utils/localStorageHelper";
+import LocalStorageHelper from "@/utils/localStorageHelper";
 
 type CurlTabProps = {
     restfulEndpoint?: RestfulEndpoint;

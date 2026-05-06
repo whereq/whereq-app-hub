@@ -1,4 +1,4 @@
-import { LocalSetting } from "@models/LocalSetting"
+import { LocalSetting } from "@/models/LocalSetting"
 import { DEFAULT_LOCAL_SETTINGS } from "./constants";
 import { LOCAL_SETTINGS_ENDPOINT } from "./constants";
 

@@ -1,4 +1,4 @@
-import { attachListenersToEditablePolygon } from "@features/map/utils/mapListeners";
+import { attachListenersToEditablePolygon } from "@/features/map/utils/mapListeners";
 import { v4 as uuidv4 } from 'uuid';
 import { highlightShape, highlightMarker, 
          createMarkerWithText, 
@@ -8,13 +8,13 @@ import { highlightShape, highlightMarker,
          createMapOverlayFromPlaceResult,
          createMapOverlayFromGeocoderResult,
          getLatLngFromPosition,
-         createResizableMarkerWithImgUrl} from "@features/map/utils/mapUtils";
-import { MapOverlay, MarkerIcon } from "@features/map/types/types";
-import { MapOverlayType, MapShapeType } from "@features/map/models/MapEnum";
-import { DEFAULT_CITY, DEFAULT_PROVINCE, MAP_DRAWING_COLOR, MAP_EVENT } from "@features/map/utils/constants";
-import { MarkerIconType } from "@features/map/models/MapEnum";
-import { eventEmitter } from "@utils/eventEmitter";
-import logUtil from "@utils/logUtil";
+         createResizableMarkerWithImgUrl} from "@/features/map/utils/mapUtils";
+import { MapOverlay, MarkerIcon } from "@/features/map/types/types";
+import { MapOverlayType, MapShapeType } from "@/features/map/models/MapEnum";
+import { DEFAULT_CITY, DEFAULT_PROVINCE, MAP_DRAWING_COLOR, MAP_EVENT } from "@/features/map/utils/constants";
+import { MarkerIconType } from "@/features/map/models/MapEnum";
+import { eventEmitter } from "@/utils/eventEmitter";
+import logUtil from "@/utils/logUtil";
 
 interface HandleSearchParams {
   searchText: string;

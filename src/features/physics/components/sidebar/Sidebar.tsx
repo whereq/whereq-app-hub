@@ -3,9 +3,9 @@ import {
     faCog,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { SectionType } from "@features/physics/models/PhysicsEnum";
-import { usePhysicsStore } from "@features/physics/store/physicsStore";
-import PhysicsMechanicsIcon from "@features/physics/icons/PhysicsMechanicsIcon";
+import { SectionType } from "@/features/physics/models/PhysicsEnum";
+import { usePhysicsStore } from "@/features/physics/store/physicsStore";
+import PhysicsMechanicsIcon from "@/features/physics/icons/PhysicsMechanicsIcon";
 import { GiElectric } from "react-icons/gi";
 import { TbMathPi } from "react-icons/tb";
 

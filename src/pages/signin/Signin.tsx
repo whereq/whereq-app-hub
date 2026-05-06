@@ -1,4 +1,4 @@
-import { useAuth } from "@hooks/userAuth";
+import { useAuth } from "@/hooks/userAuth";
 
 const Signin = () => {
   const { login, register, isLoading } = useAuth();

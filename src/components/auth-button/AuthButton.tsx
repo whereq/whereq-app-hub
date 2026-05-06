@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useAuth } from "@hooks/userAuth"; // Updated import path
-import keycloak from "@services/keycloak";
+import { useAuth } from "@/hooks/userAuth"; // Updated import path
+import keycloak from "@/services/keycloak";
 
 export const AuthButton = () => {
   const { isAuthenticated, isLoading, login, logout, register } = useAuth();

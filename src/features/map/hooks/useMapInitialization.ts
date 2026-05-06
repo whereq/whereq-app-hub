@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import LocalStorageHelper from "@utils/localStorageHelper";
-import { LOCAL_STORAGE_KEYS } from "@utils/constants";
-import { Map } from "@features/map/types/types";
-import { MapType } from "@features/map/models/MapEnum";
+import LocalStorageHelper from "@/utils/localStorageHelper";
+import { LOCAL_STORAGE_KEYS } from "@/utils/constants";
+import { Map } from "@/features/map/types/types";
+import { MapType } from "@/features/map/models/MapEnum";
 
 export const useMapInitialization = () => {
 

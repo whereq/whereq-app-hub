@@ -19,10 +19,10 @@ import {
     faObjectUngroup,
     faSave,
 } from "@fortawesome/free-solid-svg-icons";
-import { MapOverlayType, OverlayModalMode } from "@features/map/models/MapEnum";
+import { MapOverlayType, OverlayModalMode } from "@/features/map/models/MapEnum";
 
-import { useOverlayStore } from "@features/map/store/mapStore";
-import { mapOverlayToShape } from "@features/map/utils/mapUtils";
+import { useOverlayStore } from "@/features/map/store/mapStore";
+import { mapOverlayToShape } from "@/features/map/utils/mapUtils";
 
 const MapDrawingOptions: React.FC = () => {
     const { clearOverlayArrayOnMap, clearMapOverlayArrayOnMap } = useOverlayStore();

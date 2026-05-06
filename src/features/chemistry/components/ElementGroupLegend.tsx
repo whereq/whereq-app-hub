@@ -1,4 +1,4 @@
-import { CategoryEnum } from "@features/chemistry/models/ChemistryEnum";
+import { CategoryEnum } from "@/features/chemistry/models/ChemistryEnum";
 
 const ElementGroupLegend = ({
   hoveredCategory,

@@ -1,6 +1,6 @@
 import axios from "axios";
 import yaml from "js-yaml";
-import { ConstantModel } from "@features/physics/models/physicsModel";
+import { ConstantModel } from "@/features/physics/models/physicsModel";
 
 import  PHYSICAL_CONSTANTS_YAML from "../resources/constants.yaml?raw";
 

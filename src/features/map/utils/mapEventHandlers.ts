@@ -1,5 +1,5 @@
-import { MapOverlayType, MapShapeType } from "@features/map/models/MapEnum";
-import { mapOverlayToShape } from "@features/map/utils/mapUtils";
+import { MapOverlayType, MapShapeType } from "@/features/map/models/MapEnum";
+import { mapOverlayToShape } from "@/features/map/utils/mapUtils";
 
 
 export const handleLayerSwitch = (

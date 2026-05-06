@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import Event from "@features/calendar/model/event";
+import Event from "@/features/calendar/model/event";
 
 interface CalendarDayProps {
   date: dayjs.Dayjs;

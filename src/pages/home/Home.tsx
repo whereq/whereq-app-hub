@@ -1,4 +1,4 @@
-import { AppCard } from "@components/app-card/AppCard";
+import { AppCard } from "@/components/app-card/AppCard";
 import { faHexagonNodes, 
          faMap, 
          faScrewdriverWrench, 
@@ -9,7 +9,7 @@ import { faHexagonNodes,
          faGraduationCap,
          faPaw} from "@fortawesome/free-solid-svg-icons";
 import { GiMaterialsScience, GiAcid  } from "react-icons/gi";
-import { useAppStore } from "@store/store"; // Import useAppStore
+import { useAppStore } from "@/store/store"; // Import useAppStore
 
 const apps = [
   { id: 1, name: "API Explorer", icon: faHexagonNodes, description: "Public API Explorer", path: "/api-explorer" },

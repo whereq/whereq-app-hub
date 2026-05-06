@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Resizable } from "re-resizable";
 
-import { useToolsStore } from "@features/tools/store/toolsStore";
-import { SectionType } from "@features/tools/models/ToolsEnum";
-import { FormatterSection } from "@features/tools/components/workspace/FormatterSection";
-import { FormatConverterSection } from "@features/tools/components/workspace/FormatConverterSection";
-import { TextDiagramSection } from "@features/tools/components/workspace/TextDiagramSection";
-import { CanvasDrawingSection } from "@features/tools/components/workspace/CanvasDrawingSection";
+import { useToolsStore } from "@/features/tools/store/toolsStore";
+import { SectionType } from "@/features/tools/models/ToolsEnum";
+import { FormatterSection } from "@/features/tools/components/workspace/FormatterSection";
+import { FormatConverterSection } from "@/features/tools/components/workspace/FormatConverterSection";
+import { TextDiagramSection } from "@/features/tools/components/workspace/TextDiagramSection";
+import { CanvasDrawingSection } from "@/features/tools/components/workspace/CanvasDrawingSection";
 
 
 export const Workspace = () => {

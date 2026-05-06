@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { SectionType } from "@features/math/models/MathEnum";
+import { SectionType } from "@/features/math/models/MathEnum";
 
 interface MathStore {
     isWorkspaceVisible: boolean;

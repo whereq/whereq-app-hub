@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 
-import { SideBar } from "@features/api-explorer/components/sidebar/Sidebar";
-import { IndexPanel } from "@components/index-panel/IndexPanel";
+import { SideBar } from "@/features/api-explorer/components/sidebar/Sidebar";
+import { IndexPanel } from "@/components/index-panel/IndexPanel";
 
-import { RestfulEndpoint } from "@models/RestfulEndpoint";
-import { ApiExecutor } from "@features/api-executor/ApiExecutor";
+import { RestfulEndpoint } from "@/models/RestfulEndpoint";
+import { ApiExecutor } from "@/features/api-executor/ApiExecutor";
 
-import { loadApiCategoriesLocally } from "@resources/resourceLoader";
-import { SettingPanel } from "@features/api-explorer/components/sidebar/settings-panel/SettingsPanel";
+import { loadApiCategoriesLocally } from "@/resources/resourceLoader";
+import { SettingPanel } from "@/features/api-explorer/components/sidebar/settings-panel/SettingsPanel";
 
-import { TopCategory } from "@models/EndpointCategory";
+import { TopCategory } from "@/models/EndpointCategory";
 
 const ApiExplorerPage = () => {
     const [isIndexPanelVisible, setIsIndexPanelVisible] = useState(true);

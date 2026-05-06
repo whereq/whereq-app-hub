@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Sidebar } from "@features/physics/components/sidebar/Sidebar";
-import { SettingPanel } from "@features/physics/components/sidebar/settings-panel/SettingsPanel";
-import { Workspace } from "@features/physics/components/workspace/Workspace";
-import PageLayout from "@layouts/PageLayout";
-import Physics from "@features/physics/components/Physics";
-import { usePhysicsStore } from "@features/physics/store/physicsStore";
+import { Sidebar } from "@/features/physics/components/sidebar/Sidebar";
+import { SettingPanel } from "@/features/physics/components/sidebar/settings-panel/SettingsPanel";
+import { Workspace } from "@/features/physics/components/workspace/Workspace";
+import PageLayout from "@/layouts/PageLayout";
+import Physics from "@/features/physics/components/Physics";
+import { usePhysicsStore } from "@/features/physics/store/physicsStore";
 
 const PhysicsPage = () => {
     const { isWorkspaceVisible } = usePhysicsStore();

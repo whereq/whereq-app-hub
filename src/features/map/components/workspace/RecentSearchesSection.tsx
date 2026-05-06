@@ -1,11 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import { MapOverlay } from "@features/map/types/types";
-import LocalStorageHelper from "@utils/localStorageHelper";
-import { ENTRY_LIMITS, MAP_LOCAL_STORAGE_KEYS } from "@features/map/utils/constants";
-import { handleCopy } from "@utils/utils";
-import { usePlaceStore } from "@features/map/store/mapStore";
+import { MapOverlay } from "@/features/map/types/types";
+import LocalStorageHelper from "@/utils/localStorageHelper";
+import { ENTRY_LIMITS, MAP_LOCAL_STORAGE_KEYS } from "@/features/map/utils/constants";
+import { handleCopy } from "@/utils/utils";
+import { usePlaceStore } from "@/features/map/store/mapStore";
 
 export const RecentSearchesSection = () => {
     const [recentSearches, setRecentSearches] = useState<MapOverlay[]>([]);

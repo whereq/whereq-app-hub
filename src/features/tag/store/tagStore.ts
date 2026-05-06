@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { SectionType } from "@features/tag/models/TagEnum";
+import { SectionType } from "@/features/tag/models/TagEnum";
 
 interface TagStore {
     isWorkspaceVisible: boolean;

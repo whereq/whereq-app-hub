@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Map, MapOverlay } from "@features/map/types/types";
-import { MapToolMode, OverlayModalMode } from "@features/map/models/MapEnum";
-import LocalStorageHelper from "@utils/localStorageHelper";
+import { Map, MapOverlay } from "@/features/map/types/types";
+import { MapToolMode, OverlayModalMode } from "@/features/map/models/MapEnum";
+import LocalStorageHelper from "@/utils/localStorageHelper";
 import { v4 as uuidv4 } from 'uuid';
-import { LOCAL_STORAGE_KEYS } from "@utils/constants";
-import { loadMapObjectFromLocalStorage } from "@features/map/utils/mapUtils";
+import { LOCAL_STORAGE_KEYS } from "@/utils/constants";
+import { loadMapObjectFromLocalStorage } from "@/features/map/utils/mapUtils";
 
-import { useMapToolStore, useOverlayStore } from "@features/map/store/mapStore";
+import { useMapToolStore, useOverlayStore } from "@/features/map/store/mapStore";
 
 const OverlayModal: React.FC = () => {
     const [title, setTitle] = useState("");

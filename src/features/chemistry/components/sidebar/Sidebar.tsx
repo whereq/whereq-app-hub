@@ -3,9 +3,9 @@ import {
     faCog,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { SectionType } from "@features/chemistry/models/ChemistryEnum";
-import { useChemistryStore } from "@features/chemistry/store/chemistryStore";
-import PeriodicTableIcon from "@features/chemistry/icons/PeriodicTableIcon";
+import { SectionType } from "@/features/chemistry/models/ChemistryEnum";
+import { useChemistryStore } from "@/features/chemistry/store/chemistryStore";
+import PeriodicTableIcon from "@/features/chemistry/icons/PeriodicTableIcon";
 import { GiSoapExperiment } from "react-icons/gi";
 
 export const Sidebar = ({

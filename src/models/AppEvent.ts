@@ -1,4 +1,4 @@
-import { Action, EventCategory, State, Status } from "@models/enums/AppEventEnums";
+import { Action, EventCategory, State, Status } from "@/models/enums/AppEventEnums";
 
 export interface AppEvent {
     id: string; // Unique identifier for the event

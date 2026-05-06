@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchCatFact } from "@features/api-explorer/public-api/cat-fact/services/catFact";
-import { CatFact } from "@features/api-explorer/public-api/cat-fact/models/catFact";
+import { fetchCatFact } from "@/features/api-explorer/public-api/cat-fact/services/catFact";
+import { CatFact } from "@/features/api-explorer/public-api/cat-fact/models/catFact";
 
 export const useCatFact = () => {
   return useQuery<CatFact>({

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { SectionType } from "@features/category/models/CategoryEnum";
+import { SectionType } from "@/features/category/models/CategoryEnum";
 
 interface CategoryStore {
     isWorkspaceVisible: boolean;

@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faUndo, faSave } from "@fortawesome/free-solid-svg-icons";
 import Modal from "react-modal";
-import { GLOBAL_SETTINGS } from "@utils/constants";
-import { GLOBAL_SETTINGS_KEYS } from "@utils/constants";
+import { GLOBAL_SETTINGS } from "@/utils/constants";
+import { GLOBAL_SETTINGS_KEYS } from "@/utils/constants";
 
 export const SettingPanel = ({ onClose }: { onClose: () => void }) => {
     const [rows, setRows] = useState([

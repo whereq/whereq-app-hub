@@ -1,8 +1,8 @@
-import { AppRouter } from "@router/AppRouter";
-import MapProvider from "@components/map/MapProvider";
+import { AppRouter } from "@/router/AppRouter";
+import MapProvider from "@/components/map/MapProvider";
 import { useEffect, useState } from "react";
-import LocalStorageHelper from "@utils/localStorageHelper";
-import { MAP_LOCAL_STORAGE_KEYS, API_KEY } from "@features/map/utils/constants";
+import LocalStorageHelper from "@/utils/localStorageHelper";
+import { MAP_LOCAL_STORAGE_KEYS, API_KEY } from "@/features/map/utils/constants";
 
 const App = () => {
 	// const [googleMapApiKey, setGoogleMapApiKey] = useState(""); // Default to empty API key

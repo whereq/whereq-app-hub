@@ -1,4 +1,4 @@
-import logUtil from "@utils/logUtil";
+import logUtil from "@/utils/logUtil";
 
 export const addPathListeners = (
   path: google.maps.MVCArray<google.maps.LatLng>

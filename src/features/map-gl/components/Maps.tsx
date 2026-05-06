@@ -10,13 +10,13 @@ import {
     faMap,
     faTreeCity,
 } from "@fortawesome/free-solid-svg-icons";
-import LocalStorageHelper from "@utils/localStorageHelper";
-import { BASE_KEY, GOOGLE_MAP_ID } from "@features/map-gl/utils/constants";
-import PlaceInfoModal from "@features/map-gl/components/PlaceInfoModal";
-import MapDrawingOptions from "@features/map-gl/components/MapDrawingOptions";
-import CustomModal from "@components/modals/CustomModal"; // Import the CustomModal component
-import { MAP_EVENT } from "@features/map/utils/constants";
-import logUtil from "@utils/logUtil";
+import LocalStorageHelper from "@/utils/localStorageHelper";
+import { BASE_KEY, GOOGLE_MAP_ID } from "@/features/map-gl/utils/constants";
+import PlaceInfoModal from "@/features/map-gl/components/PlaceInfoModal";
+import MapDrawingOptions from "@/features/map-gl/components/MapDrawingOptions";
+import CustomModal from "@/components/modals/CustomModal"; // Import the CustomModal component
+import { MAP_EVENT } from "@/features/map/utils/constants";
+import logUtil from "@/utils/logUtil";
 
 const center = {
     lat: 43.6532,

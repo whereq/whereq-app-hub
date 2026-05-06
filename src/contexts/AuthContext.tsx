@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { AuthContext } from "@contexts/AuthContextInstance";
-import KeycloakService from "@services/keycloak";
-import type { AuthContextType } from "@contexts/AuthContextTypes";
+import { AuthContext } from "@/contexts/AuthContextInstance";
+import KeycloakService from "@/services/keycloak";
+import type { AuthContextType } from "@/contexts/AuthContextTypes";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, setState] = useState<Omit<AuthContextType, 'login' | 'logout' | 'register'>>({
@@ -43,4 +43,4 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export { AuthContext } from "@contexts/AuthContextInstance";
+export { AuthContext } from "@/contexts/AuthContextInstance";

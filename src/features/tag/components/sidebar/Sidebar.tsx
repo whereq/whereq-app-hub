@@ -5,8 +5,8 @@ import {
     faCog,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { SectionType } from "@features/tag/models/TagEnum";
-import { useTagStore } from "@features/tag/store/tagStore";
+import { SectionType } from "@/features/tag/models/TagEnum";
+import { useTagStore } from "@/features/tag/store/tagStore";
 
 export const Sidebar = ({
     openSettings,

@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import { RestfulEndpoint } from "@models/RestfulEndpoint";
+import { RestfulEndpoint } from "@/models/RestfulEndpoint";
 import { TitleBar } from "./title-bar/TitleBar";
 import { UrlPanel } from "./request-panel/UrlPanel/UrlPanel";
-import { RequestPanel } from "@features/api-executor/request-panel/RequestPanel";
-import { ResponseContent } from "@models/ResponseContent";
-import { ResponsePanel } from "@features/api-executor/response-panel/ResponsePanel";
-import { ResponseCookie } from "@models/ResponseCookie";
+import { RequestPanel } from "@/features/api-executor/request-panel/RequestPanel";
+import { ResponseContent } from "@/models/ResponseContent";
+import { ResponsePanel } from "@/features/api-executor/response-panel/ResponsePanel";
+import { ResponseCookie } from "@/models/ResponseCookie";
 import { sendRequest } from "./apiExecutorUtil"; // Import sendRequest
-import { NetworkInformation } from "@models/NetworkInformation";
-import LocalStorageHelper from "@utils/localStorageHelper"; // Import LocalStorageHelper
+import { NetworkInformation } from "@/models/NetworkInformation";
+import LocalStorageHelper from "@/utils/localStorageHelper"; // Import LocalStorageHelper
 
 export const ApiExecutor = ({ endpoint }: { endpoint?: RestfulEndpoint | null }) => {
     const [updatedParams, setUpdatedParams] = useState<Record<string, string>>({});

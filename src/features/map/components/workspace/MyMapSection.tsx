@@ -1,11 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-import { MapOverlay } from "@features/map/types/types";
-import { usePlaceStore, useMapStore, useOverlayStore } from "@features/map/store/mapStore";
-import { useExistingMap } from "@features/map/hooks/useMap";
-import { eventEmitter } from "@utils/eventEmitter";
-import { EVENT } from "@utils/constants";
-import { ENTRY_LIMITS } from "@features/map/utils/constants";
+import { MapOverlay } from "@/features/map/types/types";
+import { usePlaceStore, useMapStore, useOverlayStore } from "@/features/map/store/mapStore";
+import { useExistingMap } from "@/features/map/hooks/useMap";
+import { eventEmitter } from "@/utils/eventEmitter";
+import { EVENT } from "@/utils/constants";
+import { ENTRY_LIMITS } from "@/features/map/utils/constants";
 
 export const MyMapSection = () => {
     const {

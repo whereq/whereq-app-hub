@@ -1,5 +1,5 @@
 import React from "react";
-import MathJaxRenderer from "@utils/MathJaxRenderer"; 
+import MathJaxRenderer from "@/utils/MathJaxRenderer"; 
 
 interface FormulaModel {
   name: string; // Name of the formula

@@ -1,31 +1,31 @@
 import { Route, Routes } from "react-router-dom";
-import { Header } from "src/layouts/Header/Header";
-import { Footer } from "src/layouts/Footer/Footer";
-import Home from "@pages/home/Home";
-import About from "@pages/about/About";
-import Contact from "@pages/contact/Contact";
-import Signin from "@pages/signin/Signin";
-import Signup from "@pages/signup/Signup";
-import ApiExplorerPage from "@features/api-explorer/pages/ApiExplorerPage";
-import MapsPage from "@features/map/pages/MapsPage";
-import CalendarPage from "@features/calendar/pages/CalendarPage";
-import TagPage from "@features/tag/pages/TagPage";
-import CategoryPage from "@features/category/pages/CategoryPage";
-import AcademyPage from "@features/academy/pages/AcademyPage";
-import MathPage from "@features/math/pages/MathPage";
-import ToolsPage from "@features/tools/pages/ToolsPage";
-import PhysicsPage from "@features/physics/pages/PhysicsPage";
-import ChemistryPage from "@features/chemistry/pages/ChemistryPage";
-import PawsPage from "@features/paws/pages/PawsPage";
-import EventBoard from "@pages/event-board/EventBoard";
-import Profile from "@pages/profile/Profile";
+import { Header } from "@/layouts/Header/Header";
+import { Footer } from "@/layouts/Footer/Footer";
+import Home from "@/pages/home/Home";
+import About from "@/pages/about/About";
+import Contact from "@/pages/contact/Contact";
+import Signin from "@/pages/signin/Signin";
+import Signup from "@/pages/signup/Signup";
+import ApiExplorerPage from "@/features/api-explorer/pages/ApiExplorerPage";
+import MapsPage from "@/features/map/pages/MapsPage";
+import CalendarPage from "@/features/calendar/pages/CalendarPage";
+import TagPage from "@/features/tag/pages/TagPage";
+import CategoryPage from "@/features/category/pages/CategoryPage";
+import AcademyPage from "@/features/academy/pages/AcademyPage";
+import MathPage from "@/features/math/pages/MathPage";
+import ToolsPage from "@/features/tools/pages/ToolsPage";
+import PhysicsPage from "@/features/physics/pages/PhysicsPage";
+import ChemistryPage from "@/features/chemistry/pages/ChemistryPage";
+import PawsPage from "@/features/paws/pages/PawsPage";
+import EventBoard from "@/pages/event-board/EventBoard";
+import Profile from "@/pages/profile/Profile";
 
 export const AppRouter = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-grow overflow-y-auto mt-12" 
-        style={{ height: "calc(100vh - 6.25rem)"}}>
+      <main className="flex-grow overflow-y-auto"
+        style={{ height: "calc(100vh - 3.125rem)", marginTop: "3.125rem" }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/event-board" element={<EventBoard/>} />

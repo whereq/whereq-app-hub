@@ -1,9 +1,9 @@
 import { useState } from "react";
-import PageLayout from "@layouts/PageLayout";
-import { AppEvent } from "@models/AppEvent";
-import LocalStorageHelper from "@utils/localStorageHelper";
-import { LOCAL_STORAGE_KEYS } from "@utils/constants";
-import CodeModal from "@components/modals/CodeModal";
+import PageLayout from "@/layouts/PageLayout";
+import { AppEvent } from "@/models/AppEvent";
+import LocalStorageHelper from "@/utils/localStorageHelper";
+import { LOCAL_STORAGE_KEYS } from "@/utils/constants";
+import CodeModal from "@/components/modals/CodeModal";
 
 const EventBoard = () => {
   // Load app events from local storage

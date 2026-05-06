@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { SectionType } from "@features/paws/models/PawsEnum";
+import { SectionType } from "@/features/paws/models/PawsEnum";
 
 interface PawsStore {
     isWorkspaceVisible: boolean;

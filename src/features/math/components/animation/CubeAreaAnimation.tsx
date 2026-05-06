@@ -1,9 +1,9 @@
 // src/features/math/components/formular-visualizer/CubeAreaVisualizer.tsx
 import React, { useState, useEffect, useRef } from "react";
 import { evaluate } from "mathjs";
-import { useMathAnimationStore } from "@features/math/store/mathStore";
-import { FormularModel } from "@features/math/models/MathModel";
-import { CanvasUtil } from "@features/math/utils/canvasUtil";
+import { useMathAnimationStore } from "@/features/math/store/mathStore";
+import { FormularModel } from "@/features/math/models/MathModel";
+import { CanvasUtil } from "@/features/math/utils/canvasUtil";
 
 const CubeAreaAnimation: React.FC = () => {
     const [sideLength, setSideLength] = useState<number | null>(null);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import CustomRecurrenceModal from "@features/calendar/components/CustomRecurrenceModal";
-import Event from "@features/calendar/model/event";
+import CustomRecurrenceModal from "@/features/calendar/components/CustomRecurrenceModal";
+import Event from "@/features/calendar/model/event";
 
 interface EventCreationModalProps {
   isOpen: boolean;

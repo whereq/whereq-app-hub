@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Sidebar } from "@features/map/components/sidebar/Sidebar";
-import { SettingPanel } from "@features/map/components/sidebar/settings-panel/SettingsPanel";
-import { Workspace } from "@features/map/components/workspace/Workspace";
-import Maps from "@features/map/components/Maps";
-import PageLayout from "@layouts/PageLayout";
-import { useMapStore } from "@features/map/store/mapStore";
-import LocalStorageHelper from "@utils/localStorageHelper";
-import { GOOGLE_MAP_ID, MAP_LOCAL_STORAGE_KEYS } from "@features/map/utils/constants";
+import { Sidebar } from "@/features/map/components/sidebar/Sidebar";
+import { SettingPanel } from "@/features/map/components/sidebar/settings-panel/SettingsPanel";
+import { Workspace } from "@/features/map/components/workspace/Workspace";
+import Maps from "@/features/map/components/Maps";
+import PageLayout from "@/layouts/PageLayout";
+import { useMapStore } from "@/features/map/store/mapStore";
+import LocalStorageHelper from "@/utils/localStorageHelper";
+import { GOOGLE_MAP_ID, MAP_LOCAL_STORAGE_KEYS } from "@/features/map/utils/constants";
 
 const MapsPage = () => {
     const { isWorkspaceVisible } = useMapStore(); // Get workspace visibility from the store

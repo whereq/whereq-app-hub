@@ -1,6 +1,6 @@
 import React from "react";
 import Modal from "react-modal";
-import { NetworkInformation } from "@models/NetworkInformation";
+import { NetworkInformation } from "@/models/NetworkInformation";
 
 import "./networkInformationModal.css";
 

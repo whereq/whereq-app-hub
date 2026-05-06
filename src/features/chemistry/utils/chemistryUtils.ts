@@ -1,4 +1,4 @@
-import { CategoryEnum } from "@features/chemistry/models/ChemistryEnum";
+import { CategoryEnum } from "@/features/chemistry/models/ChemistryEnum";
 
 // Define the grid template for the 18-column layout
 export const PERIODIC_TABLE_18 = [

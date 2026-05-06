@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
-import { useAuth } from "@hooks/userAuth";
-import keycloak from "@services/keycloak";
+import { useAuth } from "@/hooks/userAuth";
+import keycloak from "@/services/keycloak";
 
 const Profile = () => {
   const { isAuthenticated } = useAuth();

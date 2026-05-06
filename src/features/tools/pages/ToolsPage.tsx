@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Sidebar } from "@features/tools/components/sidebar/Sidebar";
-import { SettingPanel } from "@features/tools/components/sidebar/settings-panel/SettingsPanel";
-import { Workspace } from "@features/tools/components/workspace/Workspace";
-import PageLayout from "@layouts/PageLayout";
-import Tools from "@features/tools/components/Tools";
-import { useToolsStore } from "@features/tools/store/toolsStore";
+import { Sidebar } from "@/features/tools/components/sidebar/Sidebar";
+import { SettingPanel } from "@/features/tools/components/sidebar/settings-panel/SettingsPanel";
+import { Workspace } from "@/features/tools/components/workspace/Workspace";
+import PageLayout from "@/layouts/PageLayout";
+import Tools from "@/features/tools/components/Tools";
+import { useToolsStore } from "@/features/tools/store/toolsStore";
 
 const ToolsPage = () => {
     const { isWorkspaceVisible } = useToolsStore();

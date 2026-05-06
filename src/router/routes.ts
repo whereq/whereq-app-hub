@@ -4,30 +4,30 @@ import { lazy } from "react";
 export const routes = [
   {
     path: "/",
-    element: lazy(() => import("@pages/home/Home")),
+    element: lazy(() => import("@/pages/home/Home")),
   },
   {
     path: "/about",
-    element: lazy(() => import("@pages/about/About")),
+    element: lazy(() => import("@/pages/about/About")),
   },
   {
     path: "/contact",
-    element: lazy(() => import("@pages/contact/Contact")),
+    element: lazy(() => import("@/pages/contact/Contact")),
   },
   {
     path: "/signin",
-    element: lazy(() => import("@pages/signin/Signin")),
+    element: lazy(() => import("@/pages/signin/Signin")),
   },
   {
     path: "/signup",
-    element: lazy(() => import("@pages/signup/Signup")),
+    element: lazy(() => import("@/pages/signup/Signup")),
   },
   {
     path: "/api-explorer",
-    element: lazy(() => import("@features/api-explorer/pages/ApiExplorerPage")),
+    element: lazy(() => import("@/features/api-explorer/pages/ApiExplorerPage")),
   },
   {
     path: "*",
-    element: lazy(() => import("@pages/not-found/NotFound")),
+    element: lazy(() => import("@/pages/not-found/NotFound")),
   },
 ];

@@ -1,4 +1,4 @@
-import PageLayout from "@layouts/PageLayout";
+import PageLayout from "@/layouts/PageLayout";
 
 export const Contact = () => {
   return (

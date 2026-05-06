@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import DateTimePickerDP from "@components/datetime-picker/DateTimePickerDP";
+import DateTimePickerDP from "@/components/datetime-picker/DateTimePickerDP";
 
 interface EventCreationModalProps {
   isOpen: boolean;

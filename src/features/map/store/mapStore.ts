@@ -1,10 +1,10 @@
 import { create } from "zustand";
-import { Place } from "@features/map/types/types";
-import { Map, MapOverlay, MapMarker } from "@features/map/types/types";
-import { MapShapeType, MapToolMode, OverlayModalMode, SectionType } from "@features/map/models/MapEnum";
-import LocalStorageHelper from "@utils/localStorageHelper";
-import { LOCAL_STORAGE_KEYS } from "@utils/constants";
-import { loadMapObjectFromLocalStorage } from "@features/map/utils/mapUtils";
+import { Place } from "@/features/map/types/types";
+import { Map, MapOverlay, MapMarker } from "@/features/map/types/types";
+import { MapShapeType, MapToolMode, OverlayModalMode, SectionType } from "@/features/map/models/MapEnum";
+import LocalStorageHelper from "@/utils/localStorageHelper";
+import { LOCAL_STORAGE_KEYS } from "@/utils/constants";
+import { loadMapObjectFromLocalStorage } from "@/features/map/utils/mapUtils";
 
 interface MapStore {
     isWorkspaceVisible: boolean;

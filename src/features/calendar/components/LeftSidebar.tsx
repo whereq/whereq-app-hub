@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faChevronDown, faChevronUp, faCaretDown } from "@fortawesome/free-solid-svg-icons";
-import MiniCalendar from "@features/calendar/components/MiniCalendar";
-import EventCreationModal from "@features/calendar/components/EventCreationModal";
-import Event from "@features/calendar/model/event";
+import MiniCalendar from "@/features/calendar/components/MiniCalendar";
+import EventCreationModal from "@/features/calendar/components/EventCreationModal";
+import Event from "@/features/calendar/model/event";
 
-import { useEventStore } from "@features/calendar/store/calendarStore";
+import { useEventStore } from "@/features/calendar/store/calendarStore";
 
 const LeftSidebar: React.FC = () => {
   const [isMyCalendarsOpen, setIsMyCalendarsOpen] = useState(true);

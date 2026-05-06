@@ -1,6 +1,6 @@
-import { MarkerIconType } from '@features/map/models/MapEnum';
-import { MapOverlayType } from "@features/map/models/MapEnum";
-import { MapType } from "@features/map/models/MapEnum";
+import { MarkerIconType } from '@/features/map/models/MapEnum';
+import { MapOverlayType } from "@/features/map/models/MapEnum";
+import { MapType } from "@/features/map/models/MapEnum";
 
 /**
  * The Place interface represents a place object that can be displayed on the map.

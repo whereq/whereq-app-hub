@@ -1,4 +1,4 @@
-import { useAuth } from "@hooks/userAuth";
+import { useAuth } from "@/hooks/userAuth";
 import { Link } from "react-router-dom";
 
 const Signup = () => {

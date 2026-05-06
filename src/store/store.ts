@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { ModalInfo } from "@components/modals/types"
-import { APPLICATION_NAME } from "@utils/constants";
+import { ModalInfo } from "@/components/modals/types"
+import { APPLICATION_NAME } from "@/utils/constants";
 
 interface AppStore {
     isAppDrawerOpen: boolean;

@@ -1,4 +1,4 @@
-import { usePawsStore } from "@features/paws/store/pawsStore";
+import { usePawsStore } from "@/features/paws/store/pawsStore";
 const Paws = () => {
     const { activeSection } = usePawsStore();
     return (

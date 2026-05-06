@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { loadPhysicalConstantsLocally } from "@features/physics/utils/resourceLoader";
-import { ConstantModel } from "@features/physics/models/physicsModel";
-import MathJaxRenderer from "@utils/MathJaxRenderer";
+import { loadPhysicalConstantsLocally } from "@/features/physics/utils/resourceLoader";
+import { ConstantModel } from "@/features/physics/models/physicsModel";
+import MathJaxRenderer from "@/utils/MathJaxRenderer";
 
 // Updated sanitizeSymbol function to handle ħc correctly
 const sanitizeSymbol = (symbol: string) => {

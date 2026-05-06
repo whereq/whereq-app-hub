@@ -5,11 +5,11 @@ import {
     faCog,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { useMathStore } from "@features/math/store/mathStore";
-import MathAnimationIcon from "@features/math/icons/MathAnimationIcon"; // Import the SVG
-import FormulaCategoryIcon from "@features/math/icons/FormulaCategoryIcon"; // Import the SVG
+import { useMathStore } from "@/features/math/store/mathStore";
+import MathAnimationIcon from "@/features/math/icons/MathAnimationIcon"; // Import the SVG
+import FormulaCategoryIcon from "@/features/math/icons/FormulaCategoryIcon"; // Import the SVG
 
-import { SectionType } from "@features/math/models/MathEnum";
+import { SectionType } from "@/features/math/models/MathEnum";
 
 export const Sidebar = ({
     openSettings,

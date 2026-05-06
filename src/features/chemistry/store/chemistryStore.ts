@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { SectionType } from "@features/chemistry/models/ChemistryEnum";
+import { SectionType } from "@/features/chemistry/models/ChemistryEnum";
 
 interface ChemistryStore {
     isWorkspaceVisible: boolean;

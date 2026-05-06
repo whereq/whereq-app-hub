@@ -1,9 +1,9 @@
-import { useMathStore } from "@features/math/store/mathStore";
-import { SectionType } from "@features/math/models/MathEnum";
-// import CircleAreaAnimation from "@features/math/components/formular-Animation/CircleAreaAnimation";
-import CubeAreaAnimation from "@features/math/components/animation/CubeAreaAnimation";
-import FormulaWiki from "@features/math/components/formula/FormulaWiki";
-import Calculator from "@features/math/components/calculator/Calculator";
+import { useMathStore } from "@/features/math/store/mathStore";
+import { SectionType } from "@/features/math/models/MathEnum";
+// import CircleAreaAnimation from "@/features/math/components/formular-Animation/CircleAreaAnimation";
+import CubeAreaAnimation from "@/features/math/components/animation/CubeAreaAnimation";
+import FormulaWiki from "@/features/math/components/formula/FormulaWiki";
+import Calculator from "@/features/math/components/calculator/Calculator";
 
 const Math = () => {
     const { activeSection } = useMathStore();

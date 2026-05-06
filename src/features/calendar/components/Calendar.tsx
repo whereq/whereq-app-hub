@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
-import CalendarHeader from "@features/calendar/components/CalendarHeader";
-import CalendarDay from "@features/calendar/components/CalendarDay";
+import CalendarHeader from "@/features/calendar/components/CalendarHeader";
+import CalendarDay from "@/features/calendar/components/CalendarDay";
 
-import { useEventStore } from "@features/calendar/store/calendarStore";
+import { useEventStore } from "@/features/calendar/store/calendarStore";
 
 
 const Calendar: React.FC = () => {

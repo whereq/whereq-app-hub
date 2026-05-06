@@ -1,9 +1,9 @@
 // import { useEffect, useState } from "react";
 import { useState } from "react";
-import { SideBar } from "@features/map-gl/components/sidebar/Sidebar";
-import { SettingPanel } from "@features/map-gl/components/sidebar/settings-panel/SettingsPanel";
-import { Workspace } from "@features/map-gl/components/workspace/Workspace";
-import Maps from "@features/map-gl/components/Maps";
+import { SideBar } from "@/features/map-gl/components/sidebar/Sidebar";
+import { SettingPanel } from "@/features/map-gl/components/sidebar/settings-panel/SettingsPanel";
+import { Workspace } from "@/features/map-gl/components/workspace/Workspace";
+import Maps from "@/features/map-gl/components/Maps";
 
 const MapsPage = () => {
     const [isWorkspaceVisible, setIsWorkspaceVisible] = useState(false);

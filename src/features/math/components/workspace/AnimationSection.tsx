@@ -4,7 +4,7 @@ import {
     faSquareCaretRight,
     faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
-import { useMathAnimationStore } from "@features/math/store/mathStore";
+import { useMathAnimationStore } from "@/features/math/store/mathStore";
 
 export const AnimationSection = () => {
     const { isMathAnimationSettingVisible, toggleMathAnimationSetting } = useMathAnimationStore();

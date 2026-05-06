@@ -1,15 +1,15 @@
 import { v4 as uuidv4 } from 'uuid';
-import { LOCAL_STORAGE_KEYS } from "@utils/constants";
-import { isValidImageUrl } from "@utils/utils";
-import LocalStorageHelper from "@utils/localStorageHelper";
-import { MAX_RECENT_SEARCHES, MAP_LOCAL_STORAGE_KEYS, MAP_DRAWING_COLOR, MAP_CENTER } from "@features/map/utils/constants";
+import { LOCAL_STORAGE_KEYS } from "@/utils/constants";
+import { isValidImageUrl } from "@/utils/utils";
+import LocalStorageHelper from "@/utils/localStorageHelper";
+import { MAX_RECENT_SEARCHES, MAP_LOCAL_STORAGE_KEYS, MAP_DRAWING_COLOR, MAP_CENTER } from "@/features/map/utils/constants";
 
 // Map-related models and types
-import { Map, MapMarker, MapOverlay, MarkerIcon } from "@features/map/types/types";
-import { MapType, MapShapeType, MapOverlayType, MarkerIconType } from "@features/map/models/MapEnum";
+import { Map, MapMarker, MapOverlay, MarkerIcon } from "@/features/map/types/types";
+import { MapType, MapShapeType, MapOverlayType, MarkerIconType } from "@/features/map/models/MapEnum";
 
 // Other types
-import { Place } from "@features/map/types/types";
+import { Place } from "@/features/map/types/types";
 
 export const mapDrawingModeToOverlayType =
   (mode: MapShapeType): google.maps.drawing.OverlayType => {

@@ -1,15 +1,15 @@
 import React, { useEffect, useRef } from "react";
 import { v4 as uuidv4 } from 'uuid';
-import { createDrawingManager, makeDefaultMarkderContent } from "@features/map/utils/mapUtils";
-import { MapOverlay } from "@features/map/types/types";
-import { useOverlayStore } from "@features/map/store/mapStore";
+import { createDrawingManager, makeDefaultMarkderContent } from "@/features/map/utils/mapUtils";
+import { MapOverlay } from "@/features/map/types/types";
+import { useOverlayStore } from "@/features/map/store/mapStore";
 import { handleCircleComplete, 
          handleMarkerComplete, 
          handlePolygonComplete, 
          handlePolylineComplete, 
-         handleRectangleComplete } from "@features/map/utils/mapHandlers";
-import { eventEmitter } from "@utils/eventEmitter";
-import { MapOverlayType, MarkerIconType } from "@features/map/models/MapEnum";
+         handleRectangleComplete } from "@/features/map/utils/mapHandlers";
+import { eventEmitter } from "@/utils/eventEmitter";
+import { MapOverlayType, MarkerIconType } from "@/features/map/models/MapEnum";
 
 type MapDrawingManagerProps = {
   mapRef: React.RefObject<google.maps.Map | null>;

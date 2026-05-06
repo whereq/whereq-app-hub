@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { MAP_EVENT } from "@features/map/utils/constants";
-import { handleSearch } from "@features/map/utils/mapHandlers";
-import { usePlaceStore, useOverlayStore } from "@features/map/store/mapStore";
+import { MAP_EVENT } from "@/features/map/utils/constants";
+import { handleSearch } from "@/features/map/utils/mapHandlers";
+import { usePlaceStore, useOverlayStore } from "@/features/map/store/mapStore";
 
 export const useMapSearch = (
     inputRef: React.RefObject<HTMLInputElement | null>,

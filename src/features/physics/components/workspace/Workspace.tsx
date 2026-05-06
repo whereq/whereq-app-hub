@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Resizable } from "re-resizable";
 
-import { usePhysicsStore } from "@features/physics/store/physicsStore";
-import { SectionType } from "@features/physics/models/PhysicsEnum";
-import { MechanicsSection } from "@features/physics/components/workspace/MechanicsSection";
-import { ElectricsSection } from "@features/physics/components/workspace/ElectricsSection";
+import { usePhysicsStore } from "@/features/physics/store/physicsStore";
+import { SectionType } from "@/features/physics/models/PhysicsEnum";
+import { MechanicsSection } from "@/features/physics/components/workspace/MechanicsSection";
+import { ElectricsSection } from "@/features/physics/components/workspace/ElectricsSection";
 
 
 export const Workspace = () => {

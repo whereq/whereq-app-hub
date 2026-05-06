@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Sidebar } from "@features/math/components/sidebar/Sidebar";
-import { SettingPanel } from "@features/math/components/sidebar/settings-panel/SettingsPanel";
-import { Workspace } from "@features/math/components/workspace/Workspace";
-import PageLayout from "@layouts/PageLayout";
-import Math from "@features/math/components/Math";
-import { useMathStore } from "@features/math/store/mathStore";
+import { Sidebar } from "@/features/math/components/sidebar/Sidebar";
+import { SettingPanel } from "@/features/math/components/sidebar/settings-panel/SettingsPanel";
+import { Workspace } from "@/features/math/components/workspace/Workspace";
+import PageLayout from "@/layouts/PageLayout";
+import Math from "@/features/math/components/Math";
+import { useMathStore } from "@/features/math/store/mathStore";
 
 const MathPage = () => {
     const { isWorkspaceVisible } = useMathStore();

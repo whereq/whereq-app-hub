@@ -1,6 +1,6 @@
 import axios from "axios";
 import yaml from "js-yaml";
-import { TopCategory } from "@models/EndpointCategory";
+import { TopCategory } from "@/models/EndpointCategory";
 
 import  PUBLIC_API_YAML from "./public-api/public-api.yaml?raw";
 

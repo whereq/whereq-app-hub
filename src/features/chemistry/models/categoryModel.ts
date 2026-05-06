@@ -1,4 +1,4 @@
-import { CategoryEnum } from "@features/chemistry/models/ChemistryEnum";
+import { CategoryEnum } from "@/features/chemistry/models/ChemistryEnum";
 
 export class CategoryModel {
   category: CategoryEnum;

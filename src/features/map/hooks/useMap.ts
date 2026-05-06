@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { useMapStore, useOverlayStore, usePlaceStore } from "@features/map/store/mapStore";
-import { loadMapObjectFromLocalStorage } from "@features/map/utils/mapUtils";
-import { Map, MapOverlay } from "@features/map/types/types";
-import { GOOGLE_MAP_ID, MAP_CENTER, MAP_EVENT, MAP_LOCAL_STORAGE_KEYS } from "@features/map/utils/constants";
-import LocalStorageHelper from "@utils/localStorageHelper";
-import { updateMarkerIcon } from "@features/map/utils/mapHandlers";
-import { MarkerIconType } from "@features/map/models/MapEnum";
+import { useMapStore, useOverlayStore, usePlaceStore } from "@/features/map/store/mapStore";
+import { loadMapObjectFromLocalStorage } from "@/features/map/utils/mapUtils";
+import { Map, MapOverlay } from "@/features/map/types/types";
+import { GOOGLE_MAP_ID, MAP_CENTER, MAP_EVENT, MAP_LOCAL_STORAGE_KEYS } from "@/features/map/utils/constants";
+import LocalStorageHelper from "@/utils/localStorageHelper";
+import { updateMarkerIcon } from "@/features/map/utils/mapHandlers";
+import { MarkerIconType } from "@/features/map/models/MapEnum";
 
 // Load My Places from local storage when the component mounts
 export const useExistingMap = (

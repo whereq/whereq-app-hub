@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Resizable } from "re-resizable";
 
-import { useTagStore } from "@features/tag/store/tagStore";
-import { SectionType } from "@features/tag/models/TagEnum";
-import { MyTagSection } from "@features/tag/components/workspace/MyTagSection";
-import { FormatConverterSection } from "@features/tag/components/workspace/WhereQTagSection";
+import { useTagStore } from "@/features/tag/store/tagStore";
+import { SectionType } from "@/features/tag/models/TagEnum";
+import { MyTagSection } from "@/features/tag/components/workspace/MyTagSection";
+import { FormatConverterSection } from "@/features/tag/components/workspace/WhereQTagSection";
 
 
 export const Workspace = () => {

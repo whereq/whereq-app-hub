@@ -1,8 +1,8 @@
-import { loadElementsLocally } from "@features/chemistry/utils/resourceLoader";
-import { ElementModel } from "@features/chemistry/models/elementModel";
+import { loadElementsLocally } from "@/features/chemistry/utils/resourceLoader";
+import { ElementModel } from "@/features/chemistry/models/elementModel";
 import { useEffect, useState } from "react";
-import { PERIODIC_TABLE_18, CATEGORY_COLOR_MAP } from "@features/chemistry/utils/chemistryUtils";
-import ElementGroupLegend from "@features/chemistry/components/ElementGroupLegend";
+import { PERIODIC_TABLE_18, CATEGORY_COLOR_MAP } from "@/features/chemistry/utils/chemistryUtils";
+import ElementGroupLegend from "@/features/chemistry/components/ElementGroupLegend";
 import React from "react";
 
 const PeriodicTable18 = () => {

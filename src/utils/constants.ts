@@ -1,4 +1,4 @@
-import { LocalSetting } from "@models/LocalSetting";
+import { LocalSetting } from "@/models/LocalSetting";
 
 export const TAB_TYPES = {
     PARAMETERS: "Parameters",

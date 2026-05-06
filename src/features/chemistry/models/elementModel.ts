@@ -1,4 +1,4 @@
-import { CategoryEnum } from "@features/chemistry/models/ChemistryEnum";
+import { CategoryEnum } from "@/features/chemistry/models/ChemistryEnum";
 
 export interface ElementModel {
   atomicNumber: number; // Atomic number of the element

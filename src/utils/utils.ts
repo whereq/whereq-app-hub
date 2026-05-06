@@ -1,8 +1,8 @@
-import { AppEvent } from "@models/AppEvent";
-import { EventCategory } from "@models/enums/AppEventEnums";
+import { AppEvent } from "@/models/AppEvent";
+import { EventCategory } from "@/models/enums/AppEventEnums";
 import { v4 as uuidv4 } from 'uuid';
-import { LOCAL_APP_EVENTS } from "@utils/constants";
-import logUtil from "@utils/logUtil";
+import { LOCAL_APP_EVENTS } from "@/utils/constants";
+import logUtil from "@/utils/logUtil";
 
 export const isValidImageUrl = (url: string): boolean => {
     try {

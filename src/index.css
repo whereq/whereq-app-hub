@@ -1,4 +1,8 @@
 @import "@fontsource/fira-code";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Thin scrollbar for dark-themed containers */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1F2937 #4B5563;
+}

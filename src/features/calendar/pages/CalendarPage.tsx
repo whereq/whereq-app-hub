@@ -1,8 +1,8 @@
 import React from "react";
-import Calendar from "@features/calendar/components/Calendar";
-import LeftSidebar from "@features/calendar/components/LeftSidebar";
-// import LeftSidebarDP from "@features/calendar/components/LeftSidebarDP";
-import RightSidebar from "@features/calendar/components/RightSidebar";
+import Calendar from "@/features/calendar/components/Calendar";
+import LeftSidebar from "@/features/calendar/components/LeftSidebar";
+// import LeftSidebarDP from "@/features/calendar/components/LeftSidebarDP";
+import RightSidebar from "@/features/calendar/components/RightSidebar";
 
 
 const CalendarPage: React.FC = () => {
