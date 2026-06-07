@@ -2,6 +2,57 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────────────────────
+   Body / html backgrounds
+   The dark MetroUI palette is `#161b27` (Tailwind's gray-900-ish
+   for our theme). Apply it at the root so:
+     - The very first paint (before React mounts) is dark, not white.
+     - Any empty space inside the fixed-position header/footer
+       shell that's outside the route content is also dark.
+   This prevents the "white band" artifact when route content is
+   shorter than the viewport. The same color is used for the
+   scrollbar track so they blend in.
+   ───────────────────────────────────────────────────────────── */
+html,
+body,
+#root {
+    background-color: #161b27;
+    min-height: 100%;
+}
+body {
+    margin: 0;
+    font-family: 'Fira Code', monospace;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Scrollbar — thin (3px), MetroUI orange-on-gray
+   Mirrors flowdesk.top's .thin-scrollbar style.
+   ───────────────────────────────────────────────────────────── */
+* {
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #6b7280 #161b27;
+}
+
+/* WebKit / Blink / Chromium (Chrome, Edge, Opera, Brave) */
+*::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+}
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+    background: #6b7280;
+    border-radius: 1px;
+}
+*::-webkit-scrollbar-thumb:hover {
+    background: #f5a623; /* MetroUI orange accent */
+}
+*::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* ─────────────────────────────────────────────────────────────
    MetroUI design tokens
    Mirrors whereq.github.io-docusaurus palette
    xs corner radius = 2px (Mantine convention)
@@ -22,12 +73,25 @@
   --radius-metro-sm: 4px;
   --radius-metro-md: 6px;
   --radius-metro-lg: 10px;
-}
 
-/* Thin scrollbar for dark-themed containers */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #1F2937 #4B5563;
+  /* Override Tailwind's default `gray` palette so `bg-gray-900`,
+     `bg-gray-800`, etc. resolve to the same MetroUI dark gray scale
+     we use on html/body. Without this, the default gray-900 is
+     a slightly different gray in oklch space and you get a visible
+     seam between the page background and any `bg-gray-900` div
+     inside it. The 50–800 shades are kept close to Tailwind's
+     default; only 900 (and 950) are unified to MetroUI. */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #161b27;
+  --color-gray-950: #0a0d14;
 }
 
 /* ─────────────────────────────────────────────────────────────

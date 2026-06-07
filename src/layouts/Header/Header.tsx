@@ -29,34 +29,47 @@ export const Header = () => {
     setAppDrawerOpen(false);
   };
 
-  // Build the navigation path
-  const buildNavigationPath = () => {
-    let navigationPath = APPLICATION_NAME;
+  // Build the navigation path. On small screens we only show the app
+  // name (no breadcrumb) because the title block is width-constrained
+  // and the breadcrumb can get long (e.g. "WhereQ App Hub -> Multimedia
+  // -> Background Remover") — the icon-only nav already gives you a
+  // way to leave any sub-page, and a compact mobile breadcrumb is
+  // available in the page itself for orientation.
+  const buildNavigationPath = (includeBreadcrumb: boolean) => {
+    if (!includeBreadcrumb) return APPLICATION_NAME;
 
+    let navigationPath = APPLICATION_NAME;
     if (currentTitle) {
       navigationPath += ` -> ${currentTitle}`;
     }
-
     if (path && path.length > 0) {
       navigationPath += ` -> ${path.join(" -> ")}`;
     }
-
     return navigationPath;
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 
-                       z-10 bg-blue-900 text-orange-300 
-                       border-b-2 border-orange-700 
+    <header className="fixed top-0 left-0 right-0
+                       z-10 bg-blue-900 text-orange-300
+                       border-b-2 border-orange-700
                        shadow-md h-[3.125rem]">
-      <div className="w-full h-full flex items-center justify-between px-4">
-        {/* App Title with Navigation Path */}
-        <h1 className="text-lg font-bold font-fira-code">
-          {buildNavigationPath()} {/* Display the navigation path */}
+      <div className="w-full h-full flex items-center justify-between px-2 sm:px-4 gap-2 sm:gap-4">
+        {/* App Title with Navigation Path.
+            The wrapper uses min-w-0 + flex-1 so the title can shrink
+            and `truncate` can ellipsize the text instead of wrapping to
+            a second line (which would push the 3.125rem header taller
+            and break the fixed-height layout). */}
+        <h1 className="text-base sm:text-lg font-bold font-fira-code min-w-0 flex-1 truncate">
+          {/* Mobile: just the app name, no breadcrumb. */}
+          <span className="sm:hidden">{buildNavigationPath(false)}</span>
+          {/* sm and up: full breadcrumb, with ellipsis if too long. */}
+          <span className="hidden sm:inline">{buildNavigationPath(true)}</span>
         </h1>
 
-        {/* Navigation Menu */}
-        <nav className="flex items-center space-x-4">
+        {/* Navigation Menu. Icon-only on all sizes; gap shrinks on mobile
+            to give the title more room. `flex-none` prevents the nav
+            from being squeezed by the title flex-1 above. */}
+        <nav className="flex items-center space-x-1.5 sm:space-x-4 flex-none">
           <NavLink
             to="/"
             title="Home"
