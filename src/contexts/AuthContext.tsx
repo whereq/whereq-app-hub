@@ -3,6 +3,22 @@ import { AuthContext } from "@/contexts/AuthContextInstance";
 import KeycloakService from "@/services/keycloak";
 import type { AuthContextType } from "@/contexts/AuthContextTypes";
 
+// Hard upper bound on how long we wait for Keycloak to respond.
+// If the 3rd-party iframe silently times out (offline / wrong
+// realm / ad-blocker), we don't want the auth context to stay in
+// `isLoading: true` forever — that would block every component
+// gated on `useAuth()` from rendering.
+const KEYCLOAK_INIT_TIMEOUT_MS = 5000;
+
+const withTimeout = <T,>(p: Promise<T>, ms: number, label: string): Promise<T> =>
+    new Promise<T>((resolve, reject) => {
+        const t = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+        p.then(
+            (v) => { clearTimeout(t); resolve(v); },
+            (e) => { clearTimeout(t); reject(e); },
+        );
+    });
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, setState] = useState<Omit<AuthContextType, 'login' | 'logout' | 'register'>>({
     isAuthenticated: false,
@@ -10,23 +26,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   useEffect(() => {
+    let cancelled = false;
     const initializeAuth = async () => {
       try {
-        const authenticated = await KeycloakService.init();
+        const authenticated = await withTimeout(
+          KeycloakService.init(),
+          KEYCLOAK_INIT_TIMEOUT_MS,
+          "Keycloak init",
+        );
+        if (cancelled) return;
         setState({
           isAuthenticated: authenticated,
           isLoading: false
         });
       } catch (error) {
+        // Keycloak unreachable / timed out / network blocked. Treat as
+        // anonymous so the rest of the app still renders. The user can
+        // sign in manually from the login page, which will retry.
         console.error("Keycloak initialization failed:", error);
-        setState(prev => ({
-          ...prev,
+        if (cancelled) return;
+        setState({
+          isAuthenticated: false,
           isLoading: false
-        }));
+        });
       }
     };
 
     initializeAuth();
+    return () => { cancelled = true; };
   }, []);
 
   const value: AuthContextType = {

@@ -1,61 +1,25 @@
 import { AppRouter } from "@/router/AppRouter";
-import MapProvider from "@/components/map/MapProvider";
-import { useEffect, useState } from "react";
-import LocalStorageHelper from "@/utils/localStorageHelper";
-import { MAP_LOCAL_STORAGE_KEYS, API_KEY } from "@/features/map/utils/constants";
 
+/**
+ * Top-level app shell.
+ *
+ * Previously this component wrapped the whole tree in a Google Maps
+ * `<LoadScript>` (via `MapProvider`), which:
+ *   1. Forced every page — even pages that don't use maps — to wait
+ *      for the Google Maps JS API to finish loading.
+ *   2. Loaded the legacy Maps JS API globally, which then collided
+ *      with the new `<APIProvider>` used by the `/map-gl` page and
+ *      produced the "Element with name 'gmp-*' already defined"
+ *      console errors and a permanently blank screen.
+ *   3. Blocked rendering of the entire router when the API key was
+ *      missing or the script failed to fire `onLoad`.
+ *
+ * Each map page now loads its own Google Maps script locally
+ * (`/map` uses `<LoadScript>`, `/map-gl` uses `<APIProvider>`), so
+ * the app shell renders immediately regardless of Maps availability.
+ */
 const App = () => {
-	// const [googleMapApiKey, setGoogleMapApiKey] = useState(""); // Default to empty API key
-	// const [isLoading, setIsLoading] = useState(true); // Loading state to block initialization
-
-    // // Load the API key from local storage
-    // useEffect(() => {
-    //     const savedSettings = LocalStorageHelper.loadSetting(BASE_KEY);
-    //     if (savedSettings) {
-    //         if (savedSettings[API_KEY]) {
-    //             setApiKey(savedSettings[API_KEY]); // Set the API key from local storage
-    //         } else {
-    //             setApiKey(""); // No API key found in local storage
-    //         }
-    //     }
-    //     setIsLoading(false); // Mark loading as complete
-    // }, []);
-
-    // Block rendering until the API key is loaded
-    // if (isLoading) {
-    //     return <div>Loading...</div>; // Show a loading indicator
-    // }
-	
-    const [googleMapApiKey, setGoogleMapApiKey] = useState("");
-    const [isInitialized, setIsInitialized] = useState<boolean>(false);
-    const [isScriptLoaded, setIsScriptLoaded] = useState<boolean>(false);
-
-    useEffect(() => {
-        const loadGoogleMapApiKey = async () => {
-            const savedSettings = LocalStorageHelper.loadSetting(MAP_LOCAL_STORAGE_KEYS.BASE_KEY);
-            if (savedSettings && savedSettings[API_KEY]) {
-                setGoogleMapApiKey(savedSettings[API_KEY]);
-            } else {
-                setGoogleMapApiKey("");
-            }
-            setIsInitialized(true);
-        };
-
-        loadGoogleMapApiKey();
-    }, []);
-
-    if (!isInitialized) {
-        return <div>Loading application...</div>;
-    }
-
-    return (
-        <MapProvider
-            apiKey={googleMapApiKey}
-            onScriptLoad={() => setIsScriptLoaded(true)}
-        >
-            {isScriptLoaded ? <AppRouter /> : <div>Loading Google Maps...</div>}
-        </MapProvider>
-    );
+    return <AppRouter />;
 };
 
 export default App;

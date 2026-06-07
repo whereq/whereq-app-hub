@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Sidebar } from "@/features/tag/components/sidebar/Sidebar";
 import { SettingPanel } from "@/features/tag/components/sidebar/settings-panel/SettingsPanel";
 import { Workspace } from "@/features/tag/components/workspace/Workspace";
@@ -9,10 +9,6 @@ import { useTagStore } from "@/features/tag/store/tagStore";
 const TagPage = () => {
     const { isWorkspaceVisible } = useTagStore();
     const [isSettingPanelVisible, setIsSettingPanelVisible] = useState(false);
-
-    useEffect(() => {
-        setIsSettingPanelVisible(false); 
-    }, []);
 
     const toggleSettingPanel = () => setIsSettingPanelVisible(!isSettingPanelVisible);
 

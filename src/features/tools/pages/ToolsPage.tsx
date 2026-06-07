@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Sidebar } from "@/features/tools/components/sidebar/Sidebar";
 import { SettingPanel } from "@/features/tools/components/sidebar/settings-panel/SettingsPanel";
 import { Workspace } from "@/features/tools/components/workspace/Workspace";
@@ -9,10 +9,6 @@ import { useToolsStore } from "@/features/tools/store/toolsStore";
 const ToolsPage = () => {
     const { isWorkspaceVisible } = useToolsStore();
     const [isSettingPanelVisible, setIsSettingPanelVisible] = useState(false);
-
-    useEffect(() => {
-        setIsSettingPanelVisible(false); 
-    }, []);
 
     const toggleSettingPanel = () => setIsSettingPanelVisible(!isSettingPanelVisible);
 
