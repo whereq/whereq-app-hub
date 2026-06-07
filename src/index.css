@@ -1,8 +1,103 @@
 @import "@fontsource/fira-code";
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────
+   MetroUI design tokens
+   Mirrors whereq.github.io-docusaurus palette
+   xs corner radius = 2px (Mantine convention)
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  --color-metro-bg: #161b27;
+  --color-metro-bg-hover: #1c2233;
+  --color-metro-border: rgba(245, 166, 35, 0.12);
+  --color-metro-border-hover: rgba(245, 166, 35, 0.4);
+  --color-metro-accent: #f5a623;
+  --color-metro-accent-soft: rgba(245, 166, 35, 0.04);
+  --color-metro-text: #f0e6c8;
+  --color-metro-text-muted: #8b949e;
+  --color-metro-text-dim: #6a737d;
+
+  /* xs (default for cards), sm, md, lg — 2/4/6/10 px */
+  --radius-metro-xs: 2px;
+  --radius-metro-sm: 4px;
+  --radius-metro-md: 6px;
+  --radius-metro-lg: 10px;
+}
+
 /* Thin scrollbar for dark-themed containers */
 * {
   scrollbar-width: thin;
   scrollbar-color: #1F2937 #4B5563;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MetroUI base primitives (utility-style, opt-in)
+   ───────────────────────────────────────────────────────────── */
+.metro-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 1.25rem;
+  background: rgba(22, 27, 39, 0.8);
+  border: 1px solid var(--color-metro-border);
+  border-radius: var(--radius-metro-xs);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.metro-card:hover {
+  border-color: var(--color-metro-border-hover);
+  background: var(--color-metro-accent-soft);
+  transform: translateX(4px);
+}
+
+.metro-card-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.metro-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: var(--radius-metro-xs);
+  flex-shrink: 0;
+}
+
+.metro-icon-wrap {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.metro-icon {
+  width: 36px;
+  height: 36px;
+  color: var(--color-metro-accent);
+}
+
+.metro-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.metro-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-metro-text);
+}
+
+.metro-desc {
+  font-size: 0.8rem;
+  color: var(--color-metro-text-muted);
 }
