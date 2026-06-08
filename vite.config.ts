@@ -23,7 +23,11 @@ export default defineConfig({
   server: {
     headers: {
       // Required by FFmpeg.wasm (SharedArrayBuffer) and other COOP/COEP-using libs.
-      // In production, hosting (flowdesk.top / whereq.com) must send the same headers.
+      // In production, hosting (Vercel) must send the same headers. The Vercel
+      // deploy config is at the project root: /vercel.json — its `headers` block
+      // must stay in sync with these three values, or the cut/merge/etc.
+      // features that need SharedArrayBuffer will silently fail to load the
+      // video engine in production.
       "Cross-Origin-Opener-Policy": "same-origin",
       "Cross-Origin-Embedder-Policy": "require-corp",
       "Cross-Origin-Resource-Policy": "cross-origin",
