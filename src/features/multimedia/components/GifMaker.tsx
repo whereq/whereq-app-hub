@@ -1072,23 +1072,73 @@ const GifMaker = () => {
                                 the image itself. Either way the user
                                 can see the segment's content without
                                 having to select it. */}
-                            {seg.kind === "video" && seg.filmstrip.length > 0 && (
-                                <div className="mt-2 flex gap-0.5 bg-black/30 rounded p-0.5">
-                                    {seg.filmstrip.map((thumb, i) => (
+                            {seg.kind === "video" && seg.filmstrip.length > 0 && (() => {
+                                // The filmstrip is one horizontal bar showing
+                                // the whole video timeline. To show the user
+                                // WHICH frames are in the current trim range,
+                                // we darken everything OUTSIDE the [start,
+                                // end] window and draw a thin orange line at
+                                // each boundary. The line marks the exact
+                                // frame the cut will happen on.
+                                //
+                                // Two absolute-positioned divs (left + right
+                                // mask) sit over the filmstrip with
+                                // pointer-events: none so they don't
+                                // intercept clicks. The boundary lines are
+                                // 2px wide and orange — visible against
+                                // light or dark frame content.
+                                const dur = seg.meta.duration || 1;
+                                const leftPct = Math.max(0, Math.min(100, (seg.trim.start / dur) * 100));
+                                const rightPct = Math.max(0, Math.min(100, ((dur - seg.trim.end) / dur) * 100));
+                                return (
+                                <div className="mt-2 relative bg-black/30 rounded p-0.5">
+                                    <div className="flex gap-0.5">
+                                        {seg.filmstrip.map((thumb, i) => (
+                                            <div
+                                                key={i}
+                                                className="flex-1 min-w-0 relative"
+                                                title={`Frame at ${(i / (seg.filmstrip.length - 1) * seg.meta.duration).toFixed(2)}s`}
+                                            >
+                                                <img
+                                                    src={thumb}
+                                                    alt={`Frame ${i + 1}`}
+                                                    className="w-full h-auto block rounded-sm"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {/* Trim range overlay — two dark masks on
+                                        the outside of the trim range, plus a
+                                        thin orange line at each boundary. The
+                                        inside of the trim range stays bright
+                                        and shows the full frame. */}
+                                    {seg.trim.start > 0 && (
                                         <div
-                                            key={i}
-                                            className="flex-1 min-w-0 relative"
-                                            title={`Frame at ${(i / (seg.filmstrip.length - 1) * seg.meta.duration).toFixed(2)}s`}
-                                        >
-                                            <img
-                                                src={thumb}
-                                                alt={`Frame ${i + 1}`}
-                                                className="w-full h-auto block rounded-sm"
-                                            />
-                                        </div>
-                                    ))}
+                                            className="absolute top-0 bottom-0 left-0 bg-black/70 pointer-events-none rounded-l"
+                                            style={{ width: `${leftPct}%` }}
+                                        />
+                                    )}
+                                    {seg.trim.end < dur && (
+                                        <div
+                                            className="absolute top-0 bottom-0 right-0 bg-black/70 pointer-events-none rounded-r"
+                                            style={{ width: `${rightPct}%` }}
+                                        />
+                                    )}
+                                    {seg.trim.start > 0 && (
+                                        <div
+                                            className="absolute top-0 bottom-0 w-0.5 bg-orange-500 pointer-events-none"
+                                            style={{ left: `${leftPct}%` }}
+                                        />
+                                    )}
+                                    {seg.trim.end < dur && (
+                                        <div
+                                            className="absolute top-0 bottom-0 w-0.5 bg-orange-500 pointer-events-none"
+                                            style={{ right: `${rightPct}%` }}
+                                        />
+                                    )}
                                 </div>
-                            )}
+                                );
+                            })()}
                             {seg.kind === "image" && (
                                 <div className="mt-2 flex justify-center bg-black/30 rounded p-2">
                                     <img
