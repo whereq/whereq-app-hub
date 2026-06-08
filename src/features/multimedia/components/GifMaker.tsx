@@ -879,11 +879,22 @@ const GifMaker = () => {
                             Segments ({segments.length}) — total {totalDuration.toFixed(1)}s
                         </h3>
                     </div>
-                    {segments.map((seg, idx) => (
+                    {segments.map((seg, idx) => {
+                        // Only the selected segment shows its edit controls
+                        // (the trim sliders for videos, the duration
+                        // slider for images). Other segments stay in
+                        // "compact" mode showing just a one-line summary
+                        // of their current trim/duration, so the list
+                        // stays scannable as the segment count grows.
+                        // A newly-added segment is auto-selected so the
+                        // user can immediately tweak it.
+                        const isSelected = selectedId === seg.id;
+                        return (
                         <div
                             key={seg.id}
-                            className={`bg-gray-800 border rounded p-3 ${
-                                selectedId === seg.id ? "border-orange-500" : "border-gray-700"
+                            onClick={() => setSelectedId(seg.id)}
+                            className={`bg-gray-800 border rounded p-3 cursor-pointer transition-colors ${
+                                isSelected ? "border-orange-500" : "border-gray-700 hover:border-gray-600"
                             }`}
                         >
                             <div className="flex items-center gap-3">
@@ -910,7 +921,7 @@ const GifMaker = () => {
                                         )}
                                     </p>
                                 </div>
-                                <div className="flex gap-1">
+                                <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
                                     <button
                                         onClick={() => handleMoveUp(seg.id)}
                                         disabled={idx === 0}
@@ -937,58 +948,96 @@ const GifMaker = () => {
                                 </div>
                             </div>
 
-                            {/* Per-segment controls */}
-                            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {/* Compact summary (always visible): tells the
+                                user what the current trim/duration is
+                                without expanding the edit controls. */}
+                            <div className="mt-2 text-xs text-gray-400">
                                 {seg.kind === "video" ? (
                                     <>
-                                        <div>
-                                            <label className="block text-xs text-gray-400 mb-1">
-                                                Start: {seg.trim.start.toFixed(2)}s
-                                            </label>
-                                            <input
-                                                type="range"
-                                                min="0"
-                                                max={seg.meta.duration || 0}
-                                                step="0.1"
-                                                value={seg.trim.start}
-                                                onChange={(e) => handleUpdateVideoTrim(seg.id, "start", Number(e.target.value))}
-                                                className="w-full"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs text-gray-400 mb-1">
-                                                End: {seg.trim.end.toFixed(2)}s
-                                            </label>
-                                            <input
-                                                type="range"
-                                                min="0"
-                                                max={seg.meta.duration || 0}
-                                                step="0.1"
-                                                value={seg.trim.end}
-                                                onChange={(e) => handleUpdateVideoTrim(seg.id, "end", Number(e.target.value))}
-                                                className="w-full"
-                                            />
-                                        </div>
+                                        <span className="text-orange-300">
+                                            {seg.trim.start.toFixed(2)}s
+                                        </span>
+                                        {" → "}
+                                        <span className="text-orange-300">
+                                            {seg.trim.end.toFixed(2)}s
+                                        </span>
+                                        <span className="text-gray-600">
+                                            {" "}({(seg.trim.end - seg.trim.start).toFixed(2)}s clip)
+                                        </span>
                                     </>
                                 ) : (
-                                    <div className="sm:col-span-2">
-                                        <label className="block text-xs text-gray-400 mb-1">
-                                            Show for: {seg.duration.toFixed(1)}s
-                                        </label>
-                                        <input
-                                            type="range"
-                                            min="0.5"
-                                            max="10"
-                                            step="0.5"
-                                            value={seg.duration}
-                                            onChange={(e) => handleUpdateImageDuration(seg.id, Number(e.target.value))}
-                                            className="w-full"
-                                        />
-                                    </div>
+                                    <>
+                                        Shown for{" "}
+                                        <span className="text-orange-300">
+                                            {seg.duration.toFixed(1)}s
+                                        </span>
+                                    </>
                                 )}
                             </div>
+
+                            {/* Edit controls — only visible when this
+                                segment is the active selection. The
+                                whole row is clickable to change
+                                selection; the per-row buttons stop
+                                propagation so they don't fire the
+                                row's onClick. */}
+                            {isSelected && (
+                                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {seg.kind === "video" ? (
+                                        <>
+                                            <div>
+                                                <label className="block text-xs text-gray-400 mb-1">
+                                                    Start: {seg.trim.start.toFixed(2)}s
+                                                </label>
+                                                <input
+                                                    type="range"
+                                                    min="0"
+                                                    max={seg.meta.duration || 0}
+                                                    step="0.1"
+                                                    value={seg.trim.start}
+                                                    onChange={(e) => handleUpdateVideoTrim(seg.id, "start", Number(e.target.value))}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="w-full"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs text-gray-400 mb-1">
+                                                    End: {seg.trim.end.toFixed(2)}s
+                                                </label>
+                                                <input
+                                                    type="range"
+                                                    min="0"
+                                                    max={seg.meta.duration || 0}
+                                                    step="0.1"
+                                                    value={seg.trim.end}
+                                                    onChange={(e) => handleUpdateVideoTrim(seg.id, "end", Number(e.target.value))}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="w-full"
+                                                />
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="sm:col-span-2">
+                                            <label className="block text-xs text-gray-400 mb-1">
+                                                Show for: {seg.duration.toFixed(1)}s
+                                            </label>
+                                            <input
+                                                type="range"
+                                                min="0.5"
+                                                max="10"
+                                                step="0.5"
+                                                value={seg.duration}
+                                                onChange={(e) => handleUpdateImageDuration(seg.id, Number(e.target.value))}
+                                                onClick={(e) => e.stopPropagation()}
+                                                className="w-full"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
 
