@@ -1,8 +1,13 @@
 import { useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUpload, faDownload, faFilm } from "@fortawesome/free-solid-svg-icons";
+import {
+    faUpload,
+    faDownload,
+    faFilm,
+} from "@fortawesome/free-solid-svg-icons";
 // @ts-expect-error - gif.js has no types
 import GIF from "gif.js";
+import CustomModal from "@/components/modals/CustomModal";
 
 /**
  * Video to GIF
@@ -15,33 +20,130 @@ import GIF from "gif.js";
  * on a typical laptop. The "every Nth frame" slider trades smoothness
  * for speed. Maximum output size is capped at 480px wide to keep GIFs
  * shareable; larger GIFs are scaled down to fit.
+ *
+ * Re-upload guard: when the user has a successful conversion on screen
+ * and picks a new video (or hits the re-upload button), we surface a
+ * warning modal instead of silently wiping the previous result. The
+ * modal gives three explicit actions — "Download previous" (save it
+ * first, then load the new video), "Discard" (load the new video
+ * immediately, the old GIF URL is revoked), or "Cancel" (keep
+ * everything as-is). We never use the browser's native alert/confirm.
  */
+
+type Status = "idle" | "ready" | "encoding" | "done" | "error";
+
+interface VideoMeta {
+    name: string;
+    size: number;
+    width: number;
+    height: number;
+    duration: number;
+}
+
+/** State captured when a file is picked but the user hasn't decided
+ *  what to do with the previous result yet. Held in a ref so the pick
+ *  handler can read it from a callback that fires before the state
+ *  update. */
+interface PendingFile {
+    file: File;
+    objectUrl: string;
+}
+
 const VideoToGif = () => {
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    /** File the user just picked but hasn't been committed yet (because
+     *  we're showing a "previous result will be lost" prompt). */
+    const pendingFileRef = useRef<PendingFile | null>(null);
+
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
-    const [meta, setMeta] = useState<{ name: string; size: number; width: number; height: number; duration: number } | null>(null);
+    const [meta, setMeta] = useState<VideoMeta | null>(null);
     const [gifUrl, setGifUrl] = useState<string | null>(null);
     const [gifSize, setGifSize] = useState<number>(0);
     const [progress, setProgress] = useState<number>(0);
-    const [status, setStatus] = useState<"idle" | "ready" | "encoding" | "done" | "error">("idle");
+    const [status, setStatus] = useState<Status>("idle");
     const [error, setError] = useState<string | null>(null);
     const [fps, setFps] = useState<number>(10);
     const [startTime, setStartTime] = useState<number>(0);
     const [endTime, setEndTime] = useState<number>(0);
     const [maxWidth, setMaxWidth] = useState<number>(480);
-    const inputRef = useRef<HTMLInputElement | null>(null);
+    /** True when the warning modal is open. */
+    const [showResetWarning, setShowResetWarning] = useState<boolean>(false);
 
-    const handleFile = (file: File) => {
+    /**
+     * Fully resets the component back to the empty state, revoking
+     * any outstanding object URLs. Called when the user picks a new
+     * video after discarding (or downloading) the previous one.
+     */
+    const resetForNewVideo = (file: File, objectUrl: string) => {
         if (videoUrl) URL.revokeObjectURL(videoUrl);
         if (gifUrl) URL.revokeObjectURL(gifUrl);
         setGifUrl(null);
+        setGifSize(0);
         setStatus("idle");
         setError(null);
         setProgress(0);
-        const url = URL.createObjectURL(file);
-        setVideoUrl(url);
+        setStartTime(0);
+        setEndTime(0);
+        setVideoUrl(objectUrl);
         setMeta({ name: file.name, size: file.size, width: 0, height: 0, duration: 0 });
+        if (inputRef.current) inputRef.current.value = "";
+    };
+
+    /**
+     * Entry point when the user picks a file via the hidden <input>.
+     * If there's no previous result, commit immediately. If there IS
+     * a previous result, stash the file in a ref and show the warning
+     * modal so the user can decide what to do.
+     */
+    const handleFileChosen = (file: File) => {
+        // If a previous file pick is still pending in the ref, revoke
+        // its blob URL — it's been superseded by this new pick. The
+        // user will see the new file's details in the warning modal.
+        if (pendingFileRef.current) {
+            URL.revokeObjectURL(pendingFileRef.current.objectUrl);
+            pendingFileRef.current = null;
+        }
+        const objectUrl = URL.createObjectURL(file);
+        const hasPreviousResult = status === "done" && !!gifUrl;
+        if (hasPreviousResult) {
+            pendingFileRef.current = { file, objectUrl };
+            setShowResetWarning(true);
+            return;
+        }
+        resetForNewVideo(file, objectUrl);
+    };
+
+    /**
+     * User picked "Download previous" in the warning modal: trigger a
+     * browser download of the existing GIF (so they can keep it), then
+     * load the new file. The download is dispatched from a click on a
+     * hidden <a> — standard browser pattern, no prompts.
+     */
+    const handleDownloadPreviousAndContinue = () => {
+        if (gifUrl && pendingFileRef.current) {
+            const a = document.createElement("a");
+            a.href = gifUrl;
+            a.download = "output.gif";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+        applyPendingFile();
+    };
+
+    /** User picked "Discard" in the warning modal: just load the new
+     *  file. The previous GIF URL is revoked inside resetForNewVideo. */
+    const handleDiscardPreviousAndContinue = () => {
+        applyPendingFile();
+    };
+
+    const applyPendingFile = () => {
+        const pending = pendingFileRef.current;
+        if (!pending) return;
+        resetForNewVideo(pending.file, pending.objectUrl);
+        pendingFileRef.current = null;
     };
 
     const onVideoMeta = () => {
@@ -93,7 +195,7 @@ const VideoToGif = () => {
             // Capture frames by seeking through the video
             const totalFrames = Math.max(1, Math.floor((endTime - startTime) * fps));
             for (let i = 0; i < totalFrames; i++) {
-                const t = startTime + (i / fps);
+                const t = startTime + i / fps;
                 await seekTo(t);
                 ctx.drawImage(v, 0, 0, outputW, outputH);
                 const imageData = ctx.getImageData(0, 0, outputW, outputH);
@@ -141,9 +243,24 @@ const VideoToGif = () => {
 
     return (
         <div className="h-full overflow-y-auto p-4 text-orange-300 font-fira-code">
-            <h2 className="text-2xl font-bold mb-2">Video to GIF</h2>
+            <div className="flex items-center justify-between mb-2">
+                <h2 className="text-2xl font-bold">Video to GIF</h2>
+                {/* Re-upload button: always visible once any video is
+                    loaded. Pushing the same hidden input so the user
+                    can re-pick without reloading the page. */}
+                {videoUrl && (
+                    <button
+                        onClick={() => inputRef.current?.click()}
+                        className="inline-flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-orange-300 px-3 py-1.5 rounded text-sm border border-gray-600"
+                        title="Upload a different video"
+                    >
+                        <FontAwesomeIcon icon={faUpload} />
+                        Upload new video
+                    </button>
+                )}
+            </div>
             <p className="text-sm text-gray-400 mb-4">
-                Convert short video clips to animated GIFs. Decodes frames from the browser's video decoder, encodes with gif.js in a Web Worker.
+                Convert short video clips to animated GIFs — runs entirely in your browser, no upload.
             </p>
 
             <input
@@ -153,7 +270,7 @@ const VideoToGif = () => {
                 className="hidden"
                 onChange={(e) => {
                     const f = e.target.files?.[0];
-                    if (f) handleFile(f);
+                    if (f) handleFileChosen(f);
                 }}
             />
 
@@ -261,6 +378,75 @@ const VideoToGif = () => {
             )}
 
             <canvas ref={canvasRef} className="hidden" />
+
+            {/* Warning modal: shown when the user picks a new video
+                while a successful result is still on screen. Uses the
+                reusable CustomModal with the new `warning` type and
+                the new `actions` array (three explicit choices, not
+                a single OK button). */}
+            <CustomModal
+                isOpen={showResetWarning}
+                onRequestClose={() => {
+                    // The "Cancel" path goes through here: just throw
+                    // away the stashed file and close the modal.
+                    if (pendingFileRef.current) {
+                        URL.revokeObjectURL(pendingFileRef.current.objectUrl);
+                        pendingFileRef.current = null;
+                    }
+                    if (inputRef.current) inputRef.current.value = "";
+                    setShowResetWarning(false);
+                }}
+                title="Replace current video?"
+                type="warning"
+                actions={[
+                    {
+                        label: "Cancel",
+                        className:
+                            "bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 transition-colors duration-200",
+                        onClick: () => {
+                            if (pendingFileRef.current) {
+                                URL.revokeObjectURL(pendingFileRef.current.objectUrl);
+                                pendingFileRef.current = null;
+                            }
+                            if (inputRef.current) inputRef.current.value = "";
+                        },
+                    },
+                    {
+                        label: "Discard & continue",
+                        className:
+                            "bg-red-600 hover:bg-red-700 text-white px-4 py-2 transition-colors duration-200",
+                        onClick: handleDiscardPreviousAndContinue,
+                    },
+                    {
+                        label: "Download previous",
+                        className:
+                            "bg-green-600 hover:bg-green-700 text-white px-4 py-2 transition-colors duration-200",
+                        onClick: handleDownloadPreviousAndContinue,
+                    },
+                ]}
+            >
+                <div className="space-y-3">
+                    <p>
+                        You have a converted GIF that hasn't been downloaded yet. If you
+                        continue, that result will be lost from this page.
+                    </p>
+                    {gifUrl && gifSize > 0 && (
+                        <div className="bg-gray-800 border border-gray-700 rounded p-3 text-sm">
+                            <div className="flex items-center gap-2 text-orange-400 font-bold mb-1">
+                                <FontAwesomeIcon icon={faFilm} />
+                                Current result
+                            </div>
+                            <div className="text-gray-300">output.gif</div>
+                            <div className="text-gray-400">Size: {formatBytes(gifSize)}</div>
+                        </div>
+                    )}
+                    <p className="text-gray-400 text-sm">
+                        Choose <span className="text-green-400 font-bold">Download previous</span> to
+                        save the current GIF first, <span className="text-red-400 font-bold">Discard &amp; continue</span> to
+                        throw it away, or <span className="text-white font-bold">Cancel</span> to keep everything as-is.
+                    </p>
+                </div>
+            </CustomModal>
         </div>
     );
 };

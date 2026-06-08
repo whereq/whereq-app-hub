@@ -1,9 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUpload, faDownload, faScissors, faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
-// @ts-expect-error - @ffmpeg/ffmpeg has no first-class types
+import {
+    faUpload,
+    faDownload,
+    faScissors,
+    faCircleExclamation,
+    faFilm,
+    faPlay,
+    faPause,
+} from "@fortawesome/free-solid-svg-icons";
+// @ffmpeg/ffmpeg ships its own types now (we no longer need a
+// @ts-expect-error for the import). If you're on an older version
+// of the lib and see a type error here, add the directive back.
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
+import CustomModal from "@/components/modals/CustomModal";
 
 /**
  * Video Splitter / Cutter
@@ -14,42 +25,501 @@ import { fetchFile, toBlobURL } from "@ffmpeg/util";
  * byte-precise trim — no quality loss, near-instantaneous regardless of
  * video length.
  *
- * Caveat: ffmpeg.wasm requires SharedArrayBuffer, which requires the
- * page to be served with:
+ * Timeline
+ * --------
+ * Once a video is loaded, the controls area shows a custom timeline:
+ *   - A row of thumbnail frames sampled at evenly-spaced timestamps.
+ *     Each thumbnail is clickable; clicking jumps the preview to that
+ *     frame's time.
+ *   - Two draggable handles (Start and End) overlaid on the timeline.
+ *     Drag a handle to scrub the cut start / cut end along the
+ *     timeline. The preview video element follows the dragged handle
+ *     so the user sees exactly what they'll be cutting.
+ *   - A playhead that tracks the video's currentTime during playback
+ *     (or scrubbing).
+ *
+ * Frame extraction uses a hidden video element + canvas; the visible
+ * preview is a separate element so the user never sees the video
+ * "jumping around" while thumbnails are being captured.
+ *
+ * FFmpeg core hosting
+ * -------------------
+ * The 32 MB `ffmpeg-core.wasm` and the ESM glue script `ffmpeg-core.js`
+ * are committed to `public/ffmpeg-core/`, so the page never has to hit
+ * a third-party CDN. The browser caches both files after the first
+ * run, so the 32 MB cost is paid once per device.
+ *
+ * Why ESM (and not UMD)? Vite builds Web Workers as ES module workers
+ * (`worker: { format: "es" }` in vite.config.ts). The UMD build of
+ * `@ffmpeg/core` is a classic-script bundle and is dynamically imported
+ * as a fallback inside `worker.js`; that fallback throws
+ * `failed to import ffmpeg-core.js` when the worker is a module worker
+ * because the UMD `var`/`module.exports` pattern isn't a valid ES
+ * module. The ESM build ends with `export default createFFmpegCore`
+ * and is what the module-worker import path needs. Both ESM files live
+ * in `public/ffmpeg-core/`.
+ *
+ * SharedArrayBuffer / COOP/COEP
+ * -----------------------------
+ * FFmpeg.wasm uses SharedArrayBuffer, which requires the page to be
+ * served with:
  *   Cross-Origin-Opener-Policy: same-origin
  *   Cross-Origin-Embedder-Policy: require-corp
- * Vite's dev server sets these by default if you set the dev.headers
- * config. For production, your hosting (flowdesk.top / whereq.com) needs
- * to send those headers — see https://web.dev/articles/coop-coep.
+ * Vite's dev server sets these by default (see vite.config.ts). For
+ * production, your hosting (flowdesk.top / whereq.com) needs to send
+ * those headers — see https://web.dev/articles/coop-coep. The page
+ * checks `window.crossOriginIsolated` on load and surfaces a clear
+ * error if those headers are missing.
  *
- * The 30 MB FFmpeg core is fetched on first use from unpkg.com (and
- * cached by the browser), unless you copy the core files into
- * /public/ffmpeg-core/. The other 5 tools in this feature group are
- * 100% local; this is the only one that pulls from a CDN.
+ * Re-upload guard: when the user has a cut result on screen and picks
+ * a new video, we surface a warning modal instead of silently wiping
+ * the previous result. Same pattern as VideoToGif / GifCompressor.
+ * We never use the browser's native alert/confirm.
  */
+
+type Status = "idle" | "cutting" | "done" | "error";
+type FfmpegLoadStatus = "loading" | "loaded" | "error";
+
+interface VideoMeta {
+    name: string;
+    size: number;
+    duration: number;
+}
+
+interface Thumbnail {
+    /** Time (seconds) the frame was sampled from. */
+    time: number;
+    /** JPEG data URL of the captured frame, ~120px wide. */
+    dataUrl: string;
+}
+
+/** How many thumbnails to sample. We pick one per second as a default
+ *  with sane min/max — too few makes the strip useless for navigation,
+ *  too many adds extraction latency for no visible benefit. */
+function thumbnailCountFor(duration: number): number {
+    if (!isFinite(duration) || duration <= 0) return 8;
+    return Math.min(20, Math.max(8, Math.ceil(duration)));
+}
+
+const FFMPEG_CORE_BASE = "/ffmpeg-core";
+
+/* ----------------------------------------------------------------- */
+/* Timeline                                                          */
+/* ----------------------------------------------------------------- */
+
+interface TimelineProps {
+    duration: number;
+    startTime: number;
+    endTime: number;
+    currentTime: number;
+    thumbnails: Thumbnail[];
+    /** Called when the user drags the start/end handle. */
+    onChangeStart: (t: number) => void;
+    onChangeEnd: (t: number) => void;
+    /** Called when the user clicks the timeline body or a thumbnail. */
+    onScrub: (t: number) => void;
+}
+
+/**
+ * Custom video timeline. Three layers stacked vertically:
+ *   1. A row of thumbnail tiles (clickable; jumps preview to that time)
+ *   2. The scrub rail with the playhead and the highlighted cut range
+ *   3. Draggable Start/End handles with a readout
+ *
+ * Drag mechanics: pointer events on the handles, with `setPointerCapture`
+ * so we keep receiving events even if the pointer leaves the handle.
+ * The `timeAtPointer` helper converts a clientX (relative to the rail)
+ * to a time in the [0, duration] range.
+ */
+const Timeline = ({
+    duration,
+    startTime,
+    endTime,
+    currentTime,
+    thumbnails,
+    onChangeStart,
+    onChangeEnd,
+    onScrub,
+}: TimelineProps) => {
+    const railRef = useRef<HTMLDivElement | null>(null);
+    /** Which handle is being dragged, if any. null = idle. */
+    const draggingRef = useRef<"start" | "end" | null>(null);
+
+    /** Convert a clientX to a time in [0, duration]. */
+    const timeAtPointer = (clientX: number): number => {
+        const rail = railRef.current;
+        if (!rail || duration <= 0) return 0;
+        const rect = rail.getBoundingClientRect();
+        const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        return ratio * duration;
+    };
+
+    /** Pointer down on a handle: start drag, capture pointer, attach
+     *  document-level move/up listeners for as long as the drag
+     *  continues. We listen on document (not the handle) so the drag
+     *  keeps tracking even if the user moves the pointer outside the
+     *  handle's bounding box. */
+    const beginDrag = (which: "start" | "end") => (e: React.PointerEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        draggingRef.current = which;
+        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    };
+
+    /** Pointer move on a handle: update the time while dragging. The
+     *  caller (VideoSplitter) is responsible for clamping start <= end
+     *  and vice versa. */
+    const onDragMove = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (!draggingRef.current) return;
+        const t = timeAtPointer(e.clientX);
+        if (draggingRef.current === "start") {
+            onChangeStart(t);
+        } else {
+            onChangeEnd(t);
+        }
+    };
+
+    /** Pointer up: end the drag, release pointer capture. */
+    const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (!draggingRef.current) return;
+        draggingRef.current = null;
+        try {
+            (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+        } catch {
+            // releasePointerCapture can throw if the pointer was
+            // already released (e.g. via contextmenu). Safe to ignore.
+        }
+    };
+
+    /** Click on the rail (not on a handle): scrub to that time. */
+    const onRailClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        // Only act if the click landed on the rail itself, not on a
+        // child element (handles stop propagation so this is also a
+        // defensive check).
+        if (e.target !== e.currentTarget) return;
+        const t = timeAtPointer(e.clientX);
+        onScrub(t);
+    };
+
+    const safeDuration = duration > 0 ? duration : 1;
+    const startPct = (startTime / safeDuration) * 100;
+    const endPct = (endTime / safeDuration) * 100;
+    const playheadPct = (currentTime / safeDuration) * 100;
+
+    return (
+        <div className="space-y-2 select-none">
+            {/* Thumbnail strip: one tile per sampled frame. Each tile
+                is a small <img> with a click-to-jump. Tile width is
+                uniform (1/thumbnailCount of the strip), so 20
+                thumbnails = 5% each, 8 = 12.5% each. */}
+            <div className="flex gap-0.5 h-16 bg-black rounded overflow-hidden">
+                {thumbnails.length === 0 ? (
+                    <div className="flex-1 flex items-center justify-center text-gray-500 text-xs">
+                        Loading thumbnails…
+                    </div>
+                ) : (
+                    thumbnails.map((th, i) => (
+                        <button
+                            key={i}
+                            type="button"
+                            onClick={() => onScrub(th.time)}
+                            className="flex-1 relative group hover:opacity-100 opacity-90 transition"
+                            title={`Jump to ${th.time.toFixed(2)}s`}
+                        >
+                            <img
+                                src={th.dataUrl}
+                                alt={`Frame at ${th.time.toFixed(2)}s`}
+                                className="w-full h-full object-cover"
+                                draggable={false}
+                            />
+                            <span className="absolute bottom-0 left-0 right-0 text-[10px] text-white bg-black bg-opacity-60 text-center leading-none py-0.5 opacity-0 group-hover:opacity-100 transition">
+                                {th.time.toFixed(1)}s
+                            </span>
+                        </button>
+                    ))
+                )}
+            </div>
+
+            {/* Scrub rail + handles. The rail is a relative-positioned
+                full-width bar; the highlighted range (between Start
+                and End) is an absolutely-positioned overlay. The
+                playhead is a thin vertical line. The Start / End
+                handles are wide, semi-transparent draggable bars. */}
+            <div
+                ref={railRef}
+                onClick={onRailClick}
+                className="relative h-8 bg-gray-700 rounded cursor-pointer"
+                role="slider"
+                aria-label="Video timeline"
+                aria-valuemin={0}
+                aria-valuemax={duration}
+                aria-valuenow={currentTime}
+            >
+                {/* Highlighted cut range: green tinted, between start
+                    and end handles. */}
+                <div
+                    className="absolute top-0 bottom-0 bg-green-600 bg-opacity-30 border-x-2 border-green-500 pointer-events-none"
+                    style={{ left: `${startPct}%`, width: `${Math.max(0, endPct - startPct)}%` }}
+                />
+
+                {/* Playhead: thin yellow line, follows currentTime. */}
+                <div
+                    className="absolute top-0 bottom-0 w-0.5 bg-yellow-400 pointer-events-none"
+                    style={{ left: `${playheadPct}%` }}
+                />
+
+                {/* Start handle: 12px wide bar on the left edge of the
+                    cut range. Always above the rail (z-10) so it
+                    receives pointer events. */}
+                <div
+                    onPointerDown={beginDrag("start")}
+                    onPointerMove={onDragMove}
+                    onPointerUp={endDrag}
+                    onPointerCancel={endDrag}
+                    className="absolute top-0 bottom-0 w-3 -ml-1.5 bg-green-500 hover:bg-green-400 cursor-ew-resize z-10 rounded-sm"
+                    style={{ left: `${startPct}%` }}
+                    title={`Start: ${startTime.toFixed(2)}s`}
+                >
+                    <div className="absolute top-0.5 left-0.5 right-0.5 h-1 bg-green-300 rounded-sm" />
+                    <div className="absolute bottom-0.5 left-0.5 right-0.5 h-1 bg-green-300 rounded-sm" />
+                </div>
+
+                {/* End handle: mirror of start, on the right edge. */}
+                <div
+                    onPointerDown={beginDrag("end")}
+                    onPointerMove={onDragMove}
+                    onPointerUp={endDrag}
+                    onPointerCancel={endDrag}
+                    className="absolute top-0 bottom-0 w-3 -ml-1.5 bg-red-500 hover:bg-red-400 cursor-ew-resize z-10 rounded-sm"
+                    style={{ left: `${endPct}%` }}
+                    title={`End: ${endTime.toFixed(2)}s`}
+                >
+                    <div className="absolute top-0.5 left-0.5 right-0.5 h-1 bg-red-300 rounded-sm" />
+                    <div className="absolute bottom-0.5 left-0.5 right-0.5 h-1 bg-red-300 rounded-sm" />
+                </div>
+            </div>
+
+            {/* Time readouts below the rail: clear at-a-glance values
+                for the three key times. */}
+            <div className="flex justify-between text-xs text-gray-300 font-mono">
+                <span>
+                    <span className="text-green-400 font-bold">Start:</span> {formatTimeHMS(startTime)}
+                </span>
+                <span>
+                    <span className="text-yellow-400 font-bold">Now:</span> {formatTimeHMS(currentTime)}
+                </span>
+                <span>
+                    <span className="text-red-400 font-bold">End:</span> {formatTimeHMS(endTime)}
+                </span>
+                <span>
+                    Length: <span className="text-orange-400 font-bold">{formatTimeHMS(endTime - startTime)}</span>
+                </span>
+            </div>
+        </div>
+    );
+};
+
+/** Format seconds as MM:SS.d (or H:MM:SS.d for >= 1 hour). */
+function formatTimeHMS(s: number): string {
+    if (!isFinite(s) || s < 0) s = 0;
+    const totalMs = Math.round(s * 10);
+    const tenths = totalMs % 10;
+    const totalSec = Math.floor(totalMs / 10);
+    const sec = totalSec % 60;
+    const min = Math.floor(totalSec / 60) % 60;
+    const hr = Math.floor(totalSec / 3600);
+    if (hr > 0) {
+        return `${hr}:${min.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")}.${tenths}`;
+    }
+    return `${min.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")}.${tenths}`;
+}
+
+/* ----------------------------------------------------------------- */
+/* Frame extraction                                                  */
+/* ----------------------------------------------------------------- */
+
+/**
+ * Extract N thumbnail frames from a video file by seeking a hidden
+ * video element to evenly-spaced timestamps and drawing each frame to
+ * a canvas. Returns JPEG data URLs.
+ *
+ * This function is intentionally tolerant of seek failures — if a
+ * particular seek doesn't resolve (e.g. the video codec doesn't
+ * support that timestamp), we capture whatever the canvas shows after
+ * a 1-second safety timeout. The result is that a partially-broken
+ * video still produces a usable thumbnail strip.
+ */
+async function extractThumbnails(file: File, duration: number): Promise<Thumbnail[]> {
+    const count = thumbnailCountFor(duration);
+    if (!isFinite(duration) || duration <= 0) return [];
+
+    const url = URL.createObjectURL(file);
+    const v = document.createElement("video");
+    v.preload = "auto";
+    v.muted = true;
+    v.crossOrigin = "anonymous";
+    v.src = url;
+
+    // Wait for metadata so we know width/height.
+    await new Promise<void>((resolve, reject) => {
+        v.onloadedmetadata = () => resolve();
+        v.onerror = () => reject(new Error("Could not load video for thumbnail extraction."));
+    });
+
+    // Cap thumbnail width at 160px (enough to be recognizable, small
+    // enough to keep total size sane). Height follows the source
+    // aspect ratio.
+    const aspect = (v.videoHeight || 9) / (v.videoWidth || 16);
+    const thumbW = 160;
+    const thumbH = Math.max(1, Math.round(thumbW * aspect));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = thumbW;
+    canvas.height = thumbH;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+        URL.revokeObjectURL(url);
+        return [];
+    }
+
+    const seekTo = (time: number): Promise<void> =>
+        new Promise((res) => {
+            const onSeeked = () => {
+                v.removeEventListener("seeked", onSeeked);
+                res();
+            };
+            v.addEventListener("seeked", onSeeked);
+            v.currentTime = Math.max(0, Math.min(time, Math.max(0, v.duration - 0.05)));
+            // Safety: if seek fails (some codecs can't seek past key
+            // boundaries), resolve after 1s with whatever the canvas
+            // has — best-effort rather than failing the whole strip.
+            setTimeout(() => {
+                v.removeEventListener("seeked", onSeeked);
+                res();
+            }, 1000);
+        });
+
+    const out: Thumbnail[] = [];
+    for (let i = 0; i < count; i++) {
+        // Evenly distribute samples across [0, duration]. For 20
+        // thumbnails, that gives one every 5% — first sample at
+        // 0, last at duration (which means the last frame may be
+        // slightly before the actual end, but is always decodable).
+        const t = (i / Math.max(1, count - 1)) * duration;
+        await seekTo(t);
+        ctx.drawImage(v, 0, 0, thumbW, thumbH);
+        // JPEG at 0.7 quality: 5-10x smaller than PNG, and the loss
+        // is invisible at thumbnail scale.
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+        out.push({ time: t, dataUrl });
+    }
+
+    URL.revokeObjectURL(url);
+    return out;
+}
+
+/* ----------------------------------------------------------------- */
+/* Main component                                                    */
+/* ----------------------------------------------------------------- */
+
 const VideoSplitter = () => {
     const [ffmpeg, setFfmpeg] = useState<FFmpeg | null>(null);
-    const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
+    const [ffmpegStatus, setFfmpegStatus] = useState<FfmpegLoadStatus>("loading");
     const [ffmpegProgress, setFfmpegProgress] = useState(0);
     const [ffmpegError, setFfmpegError] = useState<string | null>(null);
+
     const [file, setFile] = useState<File | null>(null);
-    const [meta, setMeta] = useState<{ name: string; size: number; duration: number } | null>(null);
+    const [meta, setMeta] = useState<VideoMeta | null>(null);
+    /** Object URL for the loaded file. We hold it in state (not a
+     *  derived value in JSX) so the <video> element's `src` doesn't
+     *  change on every render — if it did, the browser would
+     *  re-create the media element and reset currentTime to 0 every
+     *  time we updated any unrelated state (like the playhead).
+     *  The URL is revoked in the reset/load paths. */
+    const [fileUrl, setFileUrl] = useState<string | null>(null);
     const [startTime, setStartTime] = useState(0);
     const [endTime, setEndTime] = useState(0);
-    const [status, setStatus] = useState<"idle" | "cutting" | "done" | "error">("idle");
+    /** The video element's currentTime. Updated by:
+     *   - video.timeupdate events during playback (rAF throttled)
+     *   - handle drag in the timeline
+     *   - thumbnail click in the timeline
+     *   - play/pause via the inline button or the browser controls
+     *  This is the source of truth for the playhead position. */
+    const [currentTime, setCurrentTime] = useState(0);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [status, setStatus] = useState<Status>("idle");
     const [progress, setProgress] = useState(0);
     const [error, setError] = useState<string | null>(null);
     const [outputUrl, setOutputUrl] = useState<string | null>(null);
     const [outputSize, setOutputSize] = useState(0);
+    /** Thumbnail strip sampled from the loaded video. Replaced
+     *  wholesale on each new file. The data URLs are sized to keep
+     *  memory low (~20 × ~10KB = ~200KB per video). */
+    const [thumbnails, setThumbnails] = useState<Thumbnail[]>([]);
+    /** True while extractThumbnails is running. Shows a small badge
+     *  in the timeline area so the user knows why the strip is empty. */
+    const [isExtractingFrames, setIsExtractingFrames] = useState(false);
+
     const ffmpegRef = useRef<FFmpeg | null>(null);
     const inputRef = useRef<HTMLInputElement | null>(null);
+    /** Ref to the visible <video> element (the preview). We read its
+     *  currentTime to update the playhead, and write to it when the
+     *  user drags a handle or clicks a thumbnail. */
+    const videoPreviewRef = useRef<HTMLVideoElement | null>(null);
+    const pendingFileRef = useRef<{ file: File } | null>(null);
+    const [showResetWarning, setShowResetWarning] = useState<boolean>(false);
+    const [localCoreAvailable, setLocalCoreAvailable] = useState<boolean | null>(null);
 
-    // Probe the video for duration via a hidden <video> element
-    const probeRef = useRef<HTMLVideoElement | null>(null);
-
+    // Load FFmpeg on mount. We do a HEAD probe first to decide between
+    // local files and the unpkg fallback.
     useEffect(() => {
         const loadFFmpeg = async () => {
             try {
+                if (typeof SharedArrayBuffer === "undefined" || !window.crossOriginIsolated) {
+                    throw new Error(
+                        "SharedArrayBuffer is not available. This page must be served with COOP/COEP headers. " +
+                            "Vite dev server sets them automatically; production hosting must set " +
+                            "'Cross-Origin-Opener-Policy: same-origin' and " +
+                            "'Cross-Origin-Embedder-Policy: require-corp' on the response.",
+                    );
+                }
+
+                let coreURL: string;
+                let wasmURL: string;
+                let workerURL: string | undefined;
+                if (localCoreAvailable === null) {
+                    try {
+                        const probe = await fetch(`${FFMPEG_CORE_BASE}/ffmpeg-core.js`, { method: "HEAD" });
+                        setLocalCoreAvailable(probe.ok);
+                        if (probe.ok) {
+                            coreURL = `${FFMPEG_CORE_BASE}/ffmpeg-core.js`;
+                            wasmURL = `${FFMPEG_CORE_BASE}/ffmpeg-core.wasm`;
+                            workerURL = `${FFMPEG_CORE_BASE}/ffmpeg-core.worker.js`;
+                        } else {
+                            throw new Error("local 404");
+                        }
+                    } catch {
+                        const base = "https://unpkg.com/@ffmpeg/core@0.12.9/dist/esm";
+                        coreURL = `${base}/ffmpeg-core.js`;
+                        wasmURL = `${base}/ffmpeg-core.wasm`;
+                        workerURL = undefined;
+                    }
+                } else if (localCoreAvailable) {
+                    coreURL = `${FFMPEG_CORE_BASE}/ffmpeg-core.js`;
+                    wasmURL = `${FFMPEG_CORE_BASE}/ffmpeg-core.wasm`;
+                    workerURL = `${FFMPEG_CORE_BASE}/ffmpeg-core.worker.js`;
+                } else {
+                    const base = "https://unpkg.com/@ffmpeg/core@0.12.9/dist/esm";
+                    coreURL = `${base}/ffmpeg-core.js`;
+                    wasmURL = `${base}/ffmpeg-core.wasm`;
+                    workerURL = undefined;
+                }
+
+                const [coreBlob, wasmBlob] = await Promise.all([
+                    toBlobURL(coreURL, "text/javascript"),
+                    toBlobURL(wasmURL, "application/wasm"),
+                ]);
+
                 if (!ffmpegRef.current) {
                     const inst = new FFmpeg();
                     inst.on("log", () => { /* noisy, swallow */ });
@@ -59,42 +529,139 @@ const VideoSplitter = () => {
                     ffmpegRef.current = inst;
                 }
                 const inst = ffmpegRef.current;
-                // Load core from unpkg (cached after first run).
-                // To host locally: download
-                //   @ffmpeg/core@0.12.9/dist/umd/ffmpeg-core.js
-                //   @ffmpeg/core@0.12.9/dist/umd/ffmpeg-core.wasm
-                // into /public/ffmpeg-core/ and swap the URLs to '/ffmpeg-core/...'.
-                await inst.load({
-                    coreURL: await toBlobURL("https://unpkg.com/@ffmpeg/core@0.12.9/dist/umd/ffmpeg-core.js", "text/javascript"),
-                    wasmURL: await toBlobURL("https://unpkg.com/@ffmpeg/core@0.12.9/dist/umd/ffmpeg-core.wasm", "application/wasm"),
-                });
+
+                const loadConfig: { coreURL: string; wasmURL: string; workerURL?: string } = {
+                    coreURL: coreBlob,
+                    wasmURL: wasmBlob,
+                };
+                if (workerURL) {
+                    (loadConfig as { workerURL?: string }).workerURL = workerURL;
+                }
+                await inst.load(loadConfig);
+
                 setFfmpeg(inst);
-                setFfmpegLoaded(true);
+                setFfmpegStatus("loaded");
             } catch (e) {
-                console.error(e);
-                setFfmpegError("FFmpeg failed to load. This tool requires SharedArrayBuffer, which means the page must be served with COOP/COEP headers. See the note below.");
+                console.error("FFmpeg load failed:", e);
+                const msg = e instanceof Error ? e.message : String(e);
+                setFfmpegError(msg);
+                setFfmpegStatus("error");
             }
         };
         loadFFmpeg();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const handleFile = (f: File) => {
+    const probeVideo = (file: File): Promise<{ duration: number }> =>
+        new Promise((resolve, reject) => {
+            const url = URL.createObjectURL(file);
+            const v = document.createElement("video");
+            v.preload = "metadata";
+            v.src = url;
+            v.onloadedmetadata = () => {
+                const duration = v.duration;
+                URL.revokeObjectURL(url);
+                resolve({ duration });
+            };
+            v.onerror = () => {
+                URL.revokeObjectURL(url);
+                reject(new Error("Could not read video metadata — the file may not be a supported video format."));
+            };
+        });
+
+    /**
+     * Entry point for a newly-picked file. If a previous cut is on
+     * screen, stash the file in a ref and show the warning modal so
+     * the user can decide what to do. Otherwise commit immediately.
+     */
+    const handleFileChosen = (f: File) => {
+        pendingFileRef.current = null;
+
+        const hasPreviousResult = status === "done" && !!outputUrl;
+        if (hasPreviousResult) {
+            pendingFileRef.current = { file: f };
+            setShowResetWarning(true);
+            return;
+        }
+        loadVideoFile(f);
+    };
+
+    /** The actual load step. Reads metadata, resets state, kicks off
+     *  thumbnail extraction. The extraction runs in the background
+     *  (not awaited) so the user sees the preview video immediately
+     *  and doesn't have to wait for the strip to be populated. */
+    const loadVideoFile = async (f: File) => {
         if (outputUrl) URL.revokeObjectURL(outputUrl);
+        if (fileUrl) URL.revokeObjectURL(fileUrl);
         setOutputUrl(null);
+        setOutputSize(0);
         setError(null);
         setProgress(0);
         setFile(f);
+        setFileUrl(URL.createObjectURL(f));
         setMeta({ name: f.name, size: f.size, duration: 0 });
-        // Probe duration
-        const url = URL.createObjectURL(f);
-        const v = document.createElement("video");
-        v.preload = "metadata";
-        v.src = url;
-        v.onloadedmetadata = () => {
-            setMeta({ name: f.name, size: f.size, duration: v.duration });
+        setThumbnails([]);
+        setCurrentTime(0);
+        setIsPlaying(false);
+
+        let extractedDuration = 0;
+        try {
+            const { duration } = await probeVideo(f);
+            extractedDuration = duration;
+            setMeta({ name: f.name, size: f.size, duration });
             setStartTime(0);
-            setEndTime(v.duration);
-        };
+            setEndTime(duration);
+        } catch (e) {
+            console.error(e);
+            const msg = e instanceof Error ? e.message : String(e);
+            setError(`Could not read video metadata: ${msg}`);
+            setStatus("error");
+        } finally {
+            if (inputRef.current) inputRef.current.value = "";
+        }
+
+        // Extract thumbnails in the background. The user can already
+        // see the preview video and the playback controls; the strip
+        // populates over the next second or two.
+        if (extractedDuration > 0) {
+            setIsExtractingFrames(true);
+            extractThumbnails(f, extractedDuration)
+                .then((thumbs) => {
+                    setThumbnails(thumbs);
+                })
+                .catch((e) => {
+                    console.error("Thumbnail extraction failed:", e);
+                    // Non-fatal: the user can still use the video
+                    // without thumbnails. Just leave the strip empty
+                    // with the "Loading…" placeholder.
+                })
+                .finally(() => {
+                    setIsExtractingFrames(false);
+                });
+        }
+    };
+
+    const handleDownloadPreviousAndContinue = () => {
+        if (outputUrl) {
+            const a = document.createElement("a");
+            a.href = outputUrl;
+            a.download = "cut.mp4";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+        applyPendingFile();
+    };
+
+    const handleDiscardPreviousAndContinue = () => {
+        applyPendingFile();
+    };
+
+    const applyPendingFile = () => {
+        const pending = pendingFileRef.current;
+        if (!pending) return;
+        pendingFileRef.current = null;
+        loadVideoFile(pending.file);
     };
 
     const handleCut = async () => {
@@ -105,16 +672,21 @@ const VideoSplitter = () => {
         setError(null);
         setStatus("cutting");
         setProgress(0);
+        if (outputUrl) URL.revokeObjectURL(outputUrl);
+        setOutputUrl(null);
         try {
             const inputName = "input" + (file.name.match(/\.\w+$/)?.[0] ?? ".mp4");
             const outputName = "output.mp4";
             await ffmpeg.writeFile(inputName, await fetchFile(file));
-            // -ss before -i for fast seek, -c copy for stream copy (no re-encode)
             await ffmpeg.exec([
-                "-ss", String(startTime),
-                "-i", inputName,
-                "-to", String(endTime - startTime),
-                "-c", "copy",
+                "-ss",
+                String(startTime),
+                "-i",
+                inputName,
+                "-to",
+                String(endTime - startTime),
+                "-c",
+                "copy",
                 outputName,
             ]);
             const data = await ffmpeg.readFile(outputName);
@@ -123,7 +695,6 @@ const VideoSplitter = () => {
             setOutputSize(blob.size);
             setStatus("done");
             setProgress(100);
-            // Clean up the in-memory files
             await ffmpeg.deleteFile(inputName);
             await ffmpeg.deleteFile(outputName);
         } catch (e) {
@@ -140,16 +711,95 @@ const VideoSplitter = () => {
 
     const reset = () => {
         if (outputUrl) URL.revokeObjectURL(outputUrl);
+        if (fileUrl) URL.revokeObjectURL(fileUrl);
         setFile(null);
+        setFileUrl(null);
         setMeta(null);
         setStartTime(0);
         setEndTime(0);
+        setCurrentTime(0);
+        setIsPlaying(false);
         setOutputUrl(null);
+        setOutputSize(0);
         setStatus("idle");
         setError(null);
         setProgress(0);
+        setThumbnails([]);
         if (inputRef.current) inputRef.current.value = "";
     };
+
+    /* ----------------- timeline interaction handlers ----------------- */
+
+    /** Bound to the Start handle's drag. Clamps the value to
+     *  [0, endTime - 0.1] so the cut always has a positive length.
+     *  Reads `endTime` from the closure; this is fine because the
+     *  handler is re-created on every render and we want to clamp
+     *  against the *latest* end time, not a stale one. */
+    const handleChangeStart = (t: number) => {
+        const next = Math.max(0, Math.min(t, endTime - 0.1));
+        setStartTime(next);
+        // Sync the preview to the new start time so the user
+        // sees what they'll be cutting from.
+        if (videoPreviewRef.current) {
+            videoPreviewRef.current.currentTime = next;
+        }
+        setCurrentTime(next);
+    };
+
+    /** Bound to the End handle's drag. Clamps to
+     *  [startTime + 0.1, duration]. */
+    const handleChangeEnd = (t: number) => {
+        const next = Math.max(startTime + 0.1, Math.min(t, meta?.duration ?? t));
+        setEndTime(next);
+        if (videoPreviewRef.current) {
+            videoPreviewRef.current.currentTime = next;
+        }
+        setCurrentTime(next);
+    };
+
+    /** Bound to clicks on the timeline rail or a thumbnail tile.
+     *  Moves the preview's currentTime to that point. Does NOT
+     *  change the start/end cut handles — that's a separate
+     *  action the user takes by dragging. */
+    const handleScrub = (t: number) => {
+        if (videoPreviewRef.current) {
+            videoPreviewRef.current.currentTime = t;
+        }
+        setCurrentTime(t);
+    };
+
+    /** Toggle play/pause. Bound to the inline button. The browser's
+     *  native video controls (in the <video> element) also work
+     *  and dispatch play/pause events, which we listen for to keep
+     *  the inline button's icon in sync. */
+    const togglePlay = () => {
+        const v = videoPreviewRef.current;
+        if (!v) return;
+        if (v.paused) {
+            v.play().catch((e) => {
+                // Autoplay policies can reject play(); in that case
+                // the user can use the native controls. Log so
+                // debugging is easier.
+                console.warn("play() rejected:", e);
+            });
+        } else {
+            v.pause();
+        }
+    };
+
+    /** Re-clamp start/end if the new file has shorter duration than
+     *  the previous end time. The setStartTime/setEndTime calls are
+     *  guarded against negative values, but a stale state from a
+     *  previous file could still leak through. */
+    useEffect(() => {
+        if (!meta) return;
+        if (endTime > meta.duration) {
+            setEndTime(meta.duration);
+        }
+        if (startTime >= endTime) {
+            setStartTime(Math.max(0, endTime - 0.1));
+        }
+    }, [meta]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const formatBytes = (n: number) => {
         if (n < 1024) return `${n} B`;
@@ -157,39 +807,60 @@ const VideoSplitter = () => {
         return `${(n / (1024 * 1024)).toFixed(1)} MB`;
     };
 
-    const formatTime = (s: number) => {
-        const m = Math.floor(s / 60).toString().padStart(2, "0");
-        const r = Math.floor(s % 60).toString().padStart(2, "0");
-        return `${m}:${r}`;
-    };
-
     return (
         <div className="h-full overflow-y-auto p-4 text-orange-300 font-fira-code">
-            <h2 className="text-2xl font-bold mb-2">Video Splitter / Cutter</h2>
+            <div className="flex items-center justify-between mb-2">
+                <h2 className="text-2xl font-bold">Video Splitter / Cutter</h2>
+                {file && (
+                    <button
+                        onClick={() => inputRef.current?.click()}
+                        className="inline-flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-orange-300 px-3 py-1.5 rounded text-sm border border-gray-600"
+                        title="Upload a different video"
+                    >
+                        <FontAwesomeIcon icon={faUpload} />
+                        Upload new video
+                    </button>
+                )}
+            </div>
             <p className="text-sm text-gray-400 mb-4">
-                Trim a video by start and end timestamps. Uses FFmpeg in WebAssembly with stream copy (no re-encoding) — instant cuts, no quality loss.
+                Trim a video by start and end timestamps. Drag the green / red handles on the timeline, or click a thumbnail to jump there. Cuts run in your browser — instant cuts, no quality loss.
             </p>
 
-            {!ffmpegLoaded && !ffmpegError && (
+            {ffmpegStatus === "loading" && (
                 <div className="bg-blue-900 border border-blue-700 text-blue-200 p-3 rounded mb-4 text-sm">
-                    Loading FFmpeg core (~30 MB, first time only — cached after that)… {ffmpegProgress}%
+                    Loading video engine… {ffmpegProgress}%
                 </div>
             )}
 
-            {ffmpegError && (
+            {ffmpegStatus === "error" && ffmpegError && (
                 <div className="bg-red-900 border border-red-700 text-red-200 p-3 rounded mb-4 text-sm">
-                    <FontAwesomeIcon icon={faCircleExclamation} className="mr-2" />
-                    {ffmpegError}
+                    <div className="flex items-start gap-2">
+                        <FontAwesomeIcon icon={faCircleExclamation} className="mt-0.5 shrink-0" />
+                        <div>
+                            <div className="font-bold mb-1">Video engine failed to load.</div>
+                            <div className="font-mono text-xs">{ffmpegError}</div>
+                            {ffmpegError.includes("SharedArrayBuffer") && (
+                                <div className="mt-2">
+                                    The page is being served without the security headers required for the
+                                    video engine. Try refreshing the page, or contact the site admin.
+                                </div>
+                            )}
+                            {ffmpegError.includes("failed to import ffmpeg-core") && (
+                                <div className="mt-2">
+                                    The video engine's core script couldn't load. Try refreshing the page,
+                                    or check your network connection.
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
             )}
 
-            <div className="bg-yellow-900 border border-yellow-700 text-yellow-200 p-3 rounded mb-4 text-sm">
-                <strong>Hosting note:</strong> FFmpeg.wasm uses SharedArrayBuffer, which requires the page to be served with
-                <code className="mx-1 bg-yellow-800 px-1 rounded">Cross-Origin-Opener-Policy: same-origin</code>
-                and
-                <code className="mx-1 bg-yellow-800 px-1 rounded">Cross-Origin-Embedder-Policy: require-corp</code>
-                response headers. Vite dev server does this automatically; production deploy needs those headers set.
-            </div>
+            {/* Note: the developer-facing hosting requirements
+                (COOP/COEP headers, etc.) used to be shown here as
+                a yellow box. It leaked dev details to end users
+                without helping them. If a deploy needs that info,
+                it's documented in vite.config.ts. */}
 
             <input
                 ref={inputRef}
@@ -198,7 +869,7 @@ const VideoSplitter = () => {
                 className="hidden"
                 onChange={(e) => {
                     const f = e.target.files?.[0];
-                    if (f) handleFile(f);
+                    if (f) handleFileChosen(f);
                 }}
             />
 
@@ -221,18 +892,60 @@ const VideoSplitter = () => {
                         </p>
                     </div>
 
-                    <div>
-                        <label className="block text-sm mb-1">Start: {formatTime(startTime)}</label>
-                        <input type="range" min="0" max={meta.duration || 1} step="0.1" value={startTime} onChange={(e) => setStartTime(Math.min(Number(e.target.value), endTime))} className="w-full" />
-                    </div>
-                    <div>
-                        <label className="block text-sm mb-1">End: {formatTime(endTime)}</label>
-                        <input type="range" min="0" max={meta.duration || 1} step="0.1" value={endTime} onChange={(e) => setEndTime(Math.max(Number(e.target.value), startTime))} className="w-full" />
+                    {/* Preview area: the visible <video> element plus
+                        a custom play/pause button. The button is for
+                        quick access; the native controls are also
+                        available via the standard video UI. */}
+                    <div className="relative">
+                        <video
+                            ref={videoPreviewRef}
+                            src={fileUrl ?? undefined}
+                            controls
+                            onTimeUpdate={(e) => {
+                                // Throttle to roughly rAF cadence.
+                                // React already batches, but the
+                                // timeupdate event can fire 60+ times
+                                // a second on some browsers — we just
+                                // mirror it into state.
+                                setCurrentTime(e.currentTarget.currentTime);
+                            }}
+                            onPlay={() => setIsPlaying(true)}
+                            onPause={() => setIsPlaying(false)}
+                            onEnded={() => setIsPlaying(false)}
+                            className="w-full max-h-96 bg-black rounded border border-gray-700"
+                        />
                     </div>
 
-                    <div className="text-sm text-gray-400">
-                        Cut length: <span className="text-orange-400">{formatTime(endTime - startTime)}</span>
+                    {/* Inline play/pause button. Smaller than the
+                        native control and lives next to the timeline
+                        so the user can scrub and play from the same
+                        visual area. */}
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={togglePlay}
+                            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm"
+                            title={isPlaying ? "Pause" : "Play"}
+                        >
+                            <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} />
+                            {isPlaying ? "Pause" : "Play"}
+                        </button>
+                        {isExtractingFrames && (
+                            <span className="text-xs text-gray-400">Sampling timeline frames…</span>
+                        )}
                     </div>
+
+                    {/* The new timeline. Replaces the two old range
+                        sliders. */}
+                    <Timeline
+                        duration={meta.duration}
+                        startTime={startTime}
+                        endTime={endTime}
+                        currentTime={currentTime}
+                        thumbnails={thumbnails}
+                        onChangeStart={handleChangeStart}
+                        onChangeEnd={handleChangeEnd}
+                        onScrub={handleScrub}
+                    />
 
                     {status === "cutting" && (
                         <div>
@@ -253,7 +966,7 @@ const VideoSplitter = () => {
                     <div className="flex gap-2">
                         <button
                             onClick={handleCut}
-                            disabled={!ffmpegLoaded || status === "cutting" || endTime <= startTime}
+                            disabled={ffmpegStatus !== "loaded" || status === "cutting" || endTime <= startTime}
                             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded disabled:opacity-50"
                         >
                             {status === "cutting" ? "Cutting…" : "Cut video"}
@@ -279,7 +992,58 @@ const VideoSplitter = () => {
                 </div>
             )}
 
-            <video ref={probeRef} className="hidden" />
+            <CustomModal
+                isOpen={showResetWarning}
+                onRequestClose={() => {
+                    pendingFileRef.current = null;
+                    if (inputRef.current) inputRef.current.value = "";
+                    setShowResetWarning(false);
+                }}
+                title="Replace current video?"
+                type="warning"
+                actions={[
+                    {
+                        label: "Cancel",
+                        className: "bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 transition-colors duration-200",
+                        onClick: () => {
+                            pendingFileRef.current = null;
+                            if (inputRef.current) inputRef.current.value = "";
+                        },
+                    },
+                    {
+                        label: "Discard & continue",
+                        className: "bg-red-600 hover:bg-red-700 text-white px-4 py-2 transition-colors duration-200",
+                        onClick: handleDiscardPreviousAndContinue,
+                    },
+                    {
+                        label: "Download previous",
+                        className: "bg-green-600 hover:bg-green-700 text-white px-4 py-2 transition-colors duration-200",
+                        onClick: handleDownloadPreviousAndContinue,
+                    },
+                ]}
+            >
+                <div className="space-y-3">
+                    <p>
+                        You have a cut video that hasn't been downloaded yet. If you
+                        continue, that result will be lost from this page.
+                    </p>
+                    {outputUrl && outputSize > 0 && (
+                        <div className="bg-gray-800 border border-gray-700 rounded p-3 text-sm">
+                            <div className="flex items-center gap-2 text-orange-400 font-bold mb-1">
+                                <FontAwesomeIcon icon={faFilm} />
+                                Current result
+                            </div>
+                            <div className="text-gray-300">cut.mp4</div>
+                            <div className="text-gray-400">Size: {formatBytes(outputSize)}</div>
+                        </div>
+                    )}
+                    <p className="text-gray-400 text-sm">
+                        Choose <span className="text-green-400 font-bold">Download previous</span> to
+                        save the current cut first, <span className="text-red-400 font-bold">Discard &amp; continue</span> to
+                        throw it away, or <span className="text-white font-bold">Cancel</span> to keep everything as-is.
+                    </p>
+                </div>
+            </CustomModal>
         </div>
     );
 };

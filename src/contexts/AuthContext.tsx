@@ -43,7 +43,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // Keycloak unreachable / timed out / network blocked. Treat as
         // anonymous so the rest of the app still renders. The user can
         // sign in manually from the login page, which will retry.
-        console.error("Keycloak initialization failed:", error);
+        //
+        // Logged as `console.warn`, not `console.error`:
+        //   - this is an environmental issue (network blocked,
+        //     Keycloak server down), not a code bug
+        //   - in restricted networks (mainland China, corporate
+        //     firewalls) the warning fires on every page load and
+        //     floods the console with red errors that look alarming
+        //     but are expected and non-actionable from the app's
+        //     perspective
+        // If the developer wants the full error, they can
+        // uncomment the `console.debug` line below.
+        // eslint-disable-next-line no-console
+        console.warn("Keycloak init failed; running in anonymous mode. Cause:", error);
+        // eslint-disable-next-line no-console
+        // console.debug("Keycloak init full error:", error);
         if (cancelled) return;
         setState({
           isAuthenticated: false,

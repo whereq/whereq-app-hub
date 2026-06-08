@@ -11,7 +11,13 @@ import { SectionType } from "@/features/multimedia/models/MultimediaEnum";
 import { useMultimediaStore } from "@/features/multimedia/store/multimediaStore";
 
 const TOOLS: { section: SectionType; icon: typeof faVideo; label: string }[] = [
-    { section: SectionType.YOUTUBE_CAPTURE, icon: faVideo, label: "YouTube Capture" },
+    // HIDDEN: YouTube Capture is temporarily disabled because the
+    // embed fails on networks where `youtube.com` is blocked
+    // (mainland China, corporate firewalls, etc.) and the
+    // local-first design has no fallback. Re-enable when we
+    // decide on a real solution (e.g., a backend proxy the user
+    // is willing to accept, or a different video source).
+    // { section: SectionType.YOUTUBE_CAPTURE, icon: faVideo, label: "YouTube Capture" },
     { section: SectionType.BACKGROUND_REMOVER, icon: faImagePortrait, label: "Background Remover" },
     { section: SectionType.IMAGE_FORMAT_CONVERTER, icon: faRightLeft, label: "Image Format Converter" },
     { section: SectionType.VIDEO_TO_GIF, icon: faFilm, label: "Video to GIF" },
