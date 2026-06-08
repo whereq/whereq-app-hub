@@ -69,6 +69,14 @@ type Segment =
           meta: { name: string; size: number; duration: number; width: number; height: number };
           /** Trim window in seconds; defaults to [0, full duration]. */
           trim: { start: number; end: number };
+          /**
+           * Filmstrip of thumbnail data URLs (one per ~12.5% of
+           * duration). Always visible in the segment card so the
+           * user can see what each video contains without selecting
+           * it. Generated on add, not on selection — saves the
+           * user a click.
+           */
+          filmstrip: string[];
       }
     | {
           id: string;
@@ -85,6 +93,101 @@ type Segment =
 interface PendingFile {
     file: File;
     objectUrl: string;
+}
+
+/* ────────────────────────────────────────────────────────────────── */
+/* Filmstrip helper                                                  */
+/* ────────────────────────────────────────────────────────────────── */
+
+/**
+ * Extract N thumbnails from a video at evenly-spaced timestamps.
+ * Uses an off-screen <video> + <canvas> (no ffmpeg.wasm dependency,
+ * so this works even when the engine isn't loaded yet). Each
+ * thumbnail is a data URL the browser can render with <img src>.
+ *
+ * We seek the video through N positions and draw the current frame
+ * onto a small canvas, then toDataURL it. The video is paused
+ * throughout — seeking without playing avoids the visual glitches
+ * that come from intermediate frames being decoded.
+ *
+ * If anything goes wrong (corrupt video, seek timeout, etc.) the
+ * function returns an empty array. The segment card is still
+ * usable without thumbnails — it just won't have the visual map.
+ */
+const FILMSTRIP_COUNT = 8;
+const THUMB_WIDTH = 100;
+
+async function generateFilmstrip(blobUrl: string, duration: number): Promise<string[]> {
+    if (!duration || !isFinite(duration)) return [];
+    const video = document.createElement("video");
+    video.preload = "auto";
+    video.muted = true;
+    video.playsInline = true;
+    video.src = blobUrl;
+
+    try {
+        await new Promise<void>((res, rej) => {
+            video.onloadeddata = () => res();
+            video.onerror = () => rej(new Error("video load failed"));
+            // Safety: don't wait forever for a slow video
+            setTimeout(() => rej(new Error("video load timeout")), 10000);
+        });
+
+        // Wait for the video to be seekable to a specific time. Without
+        // this, the very first seek (t=0) can sometimes return a
+        // black frame on Chrome.
+        await new Promise<void>((res) => {
+            if (video.readyState >= 2) res();
+            else video.oncanplay = () => res();
+        });
+
+        // Compute the output canvas height from the source aspect
+        // ratio so the thumbnails don't get stretched.
+        const aspect = video.videoWidth && video.videoHeight ? video.videoHeight / video.videoWidth : 9 / 16;
+        const thumbHeight = Math.round(THUMB_WIDTH * aspect);
+        const canvas = document.createElement("canvas");
+        canvas.width = THUMB_WIDTH;
+        canvas.height = thumbHeight;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return [];
+
+        const thumbs: string[] = [];
+        for (let i = 0; i < FILMSTRIP_COUNT; i++) {
+            // Distribute the 8 timestamps across the duration. The
+            // first is at t=0 (start frame) and the last is at
+            // t=duration-0.05s (very end) to avoid the "what's at
+            // exactly the end?" ambiguity.
+            const t = i === 0 ? 0 : i === FILMSTRIP_COUNT - 1 ? Math.max(0, duration - 0.05) : (i / (FILMSTRIP_COUNT - 1)) * duration;
+            await new Promise<void>((res) => {
+                const onSeeked = () => {
+                    video.removeEventListener("seeked", onSeeked);
+                    res();
+                };
+                video.addEventListener("seeked", onSeeked);
+                video.currentTime = Math.max(0, Math.min(t, duration));
+                // Safety: if seek stalls, resolve after 500ms so the
+                // filmstrip can still produce partial results.
+                setTimeout(() => {
+                    video.removeEventListener("seeked", onSeeked);
+                    res();
+                }, 500);
+            });
+            ctx.drawImage(video, 0, 0, THUMB_WIDTH, thumbHeight);
+            thumbs.push(canvas.toDataURL("image/jpeg", 0.6));
+        }
+        return thumbs;
+    } catch (e) {
+        // The filmstrip is a progressive enhancement — the
+        // segment is still usable without thumbnails. Just log
+        // and move on rather than failing the whole add.
+        console.warn("[GifMaker] filmstrip generation failed:", e);
+        return [];
+    } finally {
+        // Clean up: drop the video element reference. The browser
+        // reclaims the underlying media when the page unloads.
+        video.removeAttribute("src");
+        video.load();
+    }
 }
 
 /* ────────────────────────────────────────────────────────────────── */
@@ -188,14 +291,24 @@ const GifMaker = () => {
     };
 
     const commitAddVideo = async (file: File, url: string) => {
-        // Use a one-shot video element to probe metadata
+        // Use a one-shot video element to probe metadata + generate
+        // the filmstrip. The same element serves both purposes: we
+        // load the file once, read its dimensions and duration,
+        // then seek through it to capture thumbnails.
         const v = document.createElement("video");
-        v.preload = "metadata";
+        v.preload = "auto";
+        v.muted = true;
         v.src = url;
         await new Promise<void>((res) => {
             v.onloadedmetadata = () => res();
             v.onerror = () => res();
         });
+        const duration = v.duration || 0;
+        // Generate the filmstrip BEFORE we add the segment to state.
+        // This way the new segment card already has its thumbnails
+        // on the first render — no "empty card that fills in a
+        // moment later" awkwardness.
+        const filmstrip = await generateFilmstrip(url, duration);
         const id = crypto.randomUUID();
         const newSeg: Segment = {
             id,
@@ -205,14 +318,18 @@ const GifMaker = () => {
             meta: {
                 name: file.name,
                 size: file.size,
-                duration: v.duration || 0,
+                duration,
                 width: v.videoWidth || 0,
                 height: v.videoHeight || 0,
             },
-            trim: { start: 0, end: v.duration || 0 },
+            trim: { start: 0, end: duration },
+            filmstrip,
         };
         setSegments((s) => [...s, newSeg]);
         setSelectedId(id);
+        // Clean up the probe video element.
+        v.removeAttribute("src");
+        v.load();
     };
 
     const handleAddImage = (file: File) => {
@@ -947,6 +1064,40 @@ const GifMaker = () => {
                                     </button>
                                 </div>
                             </div>
+
+                            {/* Filmstrip / image preview — always visible
+                                in the segment card. For video segments
+                                this is a row of 8 evenly-spaced
+                                thumbnails; for image segments it's
+                                the image itself. Either way the user
+                                can see the segment's content without
+                                having to select it. */}
+                            {seg.kind === "video" && seg.filmstrip.length > 0 && (
+                                <div className="mt-2 flex gap-0.5 bg-black/30 rounded p-0.5">
+                                    {seg.filmstrip.map((thumb, i) => (
+                                        <div
+                                            key={i}
+                                            className="flex-1 min-w-0 relative"
+                                            title={`Frame at ${(i / (seg.filmstrip.length - 1) * seg.meta.duration).toFixed(2)}s`}
+                                        >
+                                            <img
+                                                src={thumb}
+                                                alt={`Frame ${i + 1}`}
+                                                className="w-full h-auto block rounded-sm"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            {seg.kind === "image" && (
+                                <div className="mt-2 flex justify-center bg-black/30 rounded p-2">
+                                    <img
+                                        src={seg.url}
+                                        alt={seg.meta.name}
+                                        className="max-h-32 max-w-full rounded"
+                                    />
+                                </div>
+                            )}
 
                             {/* Compact summary (always visible): tells the
                                 user what the current trim/duration is
