@@ -165,3 +165,20 @@ body {
   font-size: 0.8rem;
   color: var(--color-metro-text-muted);
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Indeterminate progress bar — used by the Video Splitter's
+   cut progress when ffmpeg doesn't emit progress events (which
+   it doesn't for `-c copy` stream-copy operations). The bar
+   slides left-to-right and back, giving the user visual
+   feedback that work is happening even when we don't know
+   the exact percentage. Used by the .animate-indeterminate
+   utility class below.
+   ───────────────────────────────────────────────────────────── */
+@keyframes indeterminate-slide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+.animate-indeterminate {
+  animation: indeterminate-slide 1.4s ease-in-out infinite;
+}

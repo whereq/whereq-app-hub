@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { AppRouter } from "@/router/AppRouter";
+import { initAnalytics } from "@/lib/analytics";
 
 /**
  * Top-level app shell.
@@ -19,6 +21,13 @@ import { AppRouter } from "@/router/AppRouter";
  * the app shell renders immediately regardless of Maps availability.
  */
 const App = () => {
+    // Initialize GA4 once on mount. Safe to call without an env
+    // var — initAnalytics() is a no-op in that case (and warns in
+    // production so it's obvious during deploy that the ID is
+    // missing).
+    useEffect(() => {
+        initAnalytics();
+    }, []);
     return <AppRouter />;
 };
 

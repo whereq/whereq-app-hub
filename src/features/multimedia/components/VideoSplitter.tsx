@@ -474,6 +474,16 @@ const VideoSplitter = () => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [status, setStatus] = useState<Status>("idle");
     const [progress, setProgress] = useState(0);
+    /**
+     * Sub-phase of the current cut. FFmpeg.wasm doesn't emit
+     * progress events for stream-copy (`-c copy`) operations, so
+     * the determinate progress bar stays at 0% the whole time
+     * even though work is happening. Tracking the sub-phase lets
+     * the UI show a meaningful "what's it doing right now" label
+     * + an indeterminate animation as a fallback, so the user
+     * sees visual feedback even when no progress events fire.
+     */
+    const [cutPhase, setCutPhase] = useState<"writing" | "cutting" | "reading" | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [outputUrl, setOutputUrl] = useState<string | null>(null);
     const [outputSize, setOutputSize] = useState(0);
@@ -547,9 +557,29 @@ const VideoSplitter = () => {
 
                 if (!ffmpegRef.current) {
                     const inst = new FFmpeg();
-                    inst.on("log", () => { /* noisy, swallow */ });
+                    // The log event fires for every line ffmpeg writes
+                    // to stderr. It's noisy in normal use (per-frame
+                    // encoder stats, etc.) but invaluable when a cut
+                    // hangs and the user reports "no progress at all"
+                    // — we need to see what ffmpeg is doing. We log
+                    // at debug level so it doesn't spam the console
+                    // for normal use, and a developer can crank it
+                    // up to "info" via a filter in DevTools.
+                    inst.on("log", ({ message }: { message: string }) => {
+                        console.debug("[ffmpeg]", message);
+                    });
+                    // The progress event fires for re-encoding
+                    // operations. For `-c copy` (stream copy) cuts,
+                    // ffmpeg doesn't emit progress events at all —
+                    // the seek + stream copy is too fast to
+                    // meaningfully report percentages. We update
+                    // the cut-phase progress here when the event
+                    // does fire; the UI shows an indeterminate
+                    // animation as a fallback.
                     inst.on("progress", ({ progress: p }: { progress: number }) => {
-                        setFfmpegProgress(Math.round(p * 100));
+                        const pct = Math.round(p * 100);
+                        setFfmpegProgress(pct);
+                        setProgress(pct);
                     });
                     ffmpegRef.current = inst;
                 }
@@ -698,12 +728,14 @@ const VideoSplitter = () => {
         setError(null);
         setStatus("cutting");
         setProgress(0);
+        setCutPhase("writing");
         if (outputUrl) URL.revokeObjectURL(outputUrl);
         setOutputUrl(null);
         try {
             const inputName = "input" + (file.name.match(/\.\w+$/)?.[0] ?? ".mp4");
             const outputName = "output.mp4";
             await ffmpeg.writeFile(inputName, await fetchFile(file));
+            setCutPhase("cutting");
             await ffmpeg.exec([
                 "-ss",
                 String(startTime),
@@ -715,12 +747,14 @@ const VideoSplitter = () => {
                 "copy",
                 outputName,
             ]);
+            setCutPhase("reading");
             const data = await ffmpeg.readFile(outputName);
             const blob = new Blob([data as Uint8Array], { type: "video/mp4" });
             setOutputUrl(URL.createObjectURL(blob));
             setOutputSize(blob.size);
             setStatus("done");
             setProgress(100);
+            setCutPhase(null);
             await ffmpeg.deleteFile(inputName);
             await ffmpeg.deleteFile(outputName);
         } catch (e) {
@@ -732,6 +766,7 @@ const VideoSplitter = () => {
                 setError("Cut failed: " + msg);
             }
             setStatus("error");
+            setCutPhase(null);
         }
     };
 
@@ -750,6 +785,7 @@ const VideoSplitter = () => {
         setStatus("idle");
         setError(null);
         setProgress(0);
+        setCutPhase(null);
         setThumbnails([]);
         if (inputRef.current) inputRef.current.value = "";
     };
@@ -961,11 +997,41 @@ const VideoSplitter = () => {
                     {status === "cutting" && (
                         <div>
                             <div className="flex justify-between text-sm text-orange-400 mb-1">
-                                <span>Cutting…</span>
-                                <span>{progress}%</span>
+                                <span>
+                                    {cutPhase === "writing" && "Loading video into engine…"}
+                                    {cutPhase === "cutting" && "Cutting…"}
+                                    {cutPhase === "reading" && "Reading result…"}
+                                    {!cutPhase && "Cutting…"}
+                                </span>
+                                <span>
+                                    {progress > 0 ? `${progress}%` : ""}
+                                </span>
                             </div>
-                            <div className="w-full h-2 bg-gray-700 rounded overflow-hidden">
-                                <div className="h-full bg-orange-500 transition-all" style={{ width: `${progress}%` }} />
+                            {/* Show a determinate bar when we have
+                                actual progress events (typically
+                                re-encoding). For stream-copy cuts
+                                (no progress events), fall back to
+                                an indeterminate animation so the
+                                user has visual feedback that
+                                something is happening. The CSS
+                                animation runs continuously until
+                                the phase changes. */}
+                            <div className="w-full h-2 bg-gray-700 rounded overflow-hidden relative">
+                                {progress > 0 ? (
+                                    <div
+                                        className="h-full bg-orange-500 transition-all"
+                                        style={{ width: `${progress}%` }}
+                                    />
+                                ) : (
+                                    // Indeterminate animation for
+                                    // stream-copy cuts where ffmpeg
+                                    // doesn't emit progress events.
+                                    // The sliding bar gives the user
+                                    // visual feedback that work is
+                                    // happening without claiming a
+                                    // specific percentage.
+                                    <div className="absolute top-0 left-0 h-full w-1/3 bg-orange-500/70 animate-indeterminate rounded" />
+                                )}
                             </div>
                         </div>
                     )}

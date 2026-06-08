@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { Header } from "@/layouts/Header/Header";
 import { Footer } from "@/layouts/Footer/Footer";
+import { RouteChangeTracker } from "@/components/analytics/RouteChangeTracker";
 import Home from "@/pages/home/Home";
 import About from "@/pages/about/About";
 import Contact from "@/pages/contact/Contact";
@@ -48,6 +49,8 @@ export const AppRouter = () => {
     // resolve to #161b27 — the same color used on html/body.
     <div className="flex flex-col min-h-screen bg-gray-900">
       <Header />
+      {/* Fire a GA4 pageview for every client-side route change. */}
+      <RouteChangeTracker />
       <main
         className="flex-grow overflow-y-auto"
         style={{
