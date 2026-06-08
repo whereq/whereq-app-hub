@@ -8,11 +8,10 @@ import {
     faCircleInfo,
     faCircleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
-// @ffmpeg/ffmpeg ships its own types now. If you see a type error
-// on the import, the lib version may have rolled back; add
-// `// @ts-expect-error` back above.
-import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { fetchFile, toBlobURL } from "@ffmpeg/util";
+// @ffmpeg/ffmpeg types are no longer needed in this file — the
+// FFmpeg instance is owned by useFfmpegEngine.
+import { fetchFile } from "@ffmpeg/util";
+import { useFfmpegEngine } from "@/features/multimedia/hooks/useFfmpegEngine";
 import CustomModal from "@/components/modals/CustomModal";
 
 /**
@@ -64,7 +63,6 @@ import CustomModal from "@/components/modals/CustomModal";
  */
 
 type Status = "idle" | "ready" | "merging" | "done" | "error";
-type FfmpegStatus = "loading" | "loaded" | "error";
 /** What to do when the two input durations differ. */
 type LengthMode = "shortest" | "longest" | "trim-to-video" | "trim-to-audio";
 
@@ -91,15 +89,25 @@ interface PendingFile {
     objectUrl: string;
 }
 
-const FFMPEG_CORE_BASE = "/ffmpeg-core";
-
 const AudioVideoMerger = () => {
-    // FFmpeg state. The instance lives in a ref so we don't lose
-    // it on re-render. The "loaded / loading" UI indicator is
-    // tracked separately via `ffmpegStatus`.
-    const ffmpegRef = useRef<FFmpeg | null>(null);
-    const [ffmpegStatus, setFfmpegStatus] = useState<FfmpegStatus>("loading");
-    const [ffmpegProgress, setFfmpegProgress] = useState(0);
+    // FFmpeg state. The engine is a module-level singleton shared
+    // across all Multimedia tools (see useFfmpegEngine). Switching
+    // to/from VideoSplitter or the new GifMaker doesn't re-download
+    // the 30 MB core. The "loaded / loading / error" indicator
+    // is per-component so the UI can react to the singleton's
+    // status.
+    const { ffmpeg, status: ffmpegStatus } = useFfmpegEngine();
+    // The hook fires the log handler; we wire the per-component
+    // progress handler here. See the same pattern in VideoSplitter
+    // for the listener-leak trade-off discussion.
+    useEffect(() => {
+        if (!ffmpeg) return;
+        const handler = ({ progress: p }: { progress: number }) => {
+            const pct = Math.round(p * 100);
+            setProgress(pct);
+        };
+        ffmpeg.on("progress", handler);
+    }, [ffmpeg]);
 
     // File inputs
     const videoInputRef = useRef<HTMLInputElement | null>(null);
@@ -125,6 +133,21 @@ const AudioVideoMerger = () => {
     // Processing
     const [status, setStatus] = useState<Status>("idle");
     const [progress, setProgress] = useState(0);
+    /**
+     * Sub-phase of the current merge. Tracks the slow steps
+     * of the operation (writing each input file to the
+     * virtual FS, the actual libx264 re-encode, reading the
+     * result) so the UI can show meaningful "what's it doing
+     * right now" labels + an indeterminate progress bar when
+     * no real progress events are firing. The merge re-encodes
+     * (unlike the cut's stream-copy), so real progress events
+     * DO fire during the encoding phase — the phase label just
+     * makes the silent parts (file writes, result read) also
+     * visible.
+     */
+    const [mergePhase, setMergePhase] = useState<
+        "writing-video" | "writing-audio" | "encoding" | "reading" | null
+    >(null);
     const [error, setError] = useState<string | null>(null);
     const [outputUrl, setOutputUrl] = useState<string | null>(null);
     const [outputSize, setOutputSize] = useState(0);
@@ -136,66 +159,7 @@ const AudioVideoMerger = () => {
     /* FFmpeg bootstrap                                                */
     /* -------------------------------------------------------------- */
 
-    // Load FFmpeg on mount. Same pattern as VideoSplitter — see
-    // the long comment block at the top of that file for the
-    // "why ESM not UMD" / "why SharedArrayBuffer" / "why we keep
-    // a ref" explanation. We log the failure to the console but
-    // do NOT show the user a scary error banner; the file-pick
-    // and pre-merge preview flow still works without the engine.
-    useEffect(() => {
-        const loadFFmpeg = async () => {
-            try {
-                if (typeof SharedArrayBuffer === "undefined" || !window.crossOriginIsolated) {
-                    throw new Error(
-                        "SharedArrayBuffer is not available. This page must be served with COOP/COEP headers.",
-                    );
-                }
-
-                // Probe whether the local core files were copied to
-                // public/ffmpeg-core/; fall back to the unpkg CDN
-                // if not. The CDN adds a network round-trip but
-                // keeps the dev experience working out of the box.
-                let coreURL: string;
-                let wasmURL: string;
-                try {
-                    const probe = await fetch(`${FFMPEG_CORE_BASE}/ffmpeg-core.js`, { method: "HEAD" });
-                    if (probe.ok) {
-                        coreURL = `${FFMPEG_CORE_BASE}/ffmpeg-core.js`;
-                        wasmURL = `${FFMPEG_CORE_BASE}/ffmpeg-core.wasm`;
-                    } else {
-                        throw new Error("local 404");
-                    }
-                } catch {
-                    const base = "https://unpkg.com/@ffmpeg/core@0.12.9/dist/esm";
-                    coreURL = `${base}/ffmpeg-core.js`;
-                    wasmURL = `${base}/ffmpeg-core.wasm`;
-                }
-
-                // The shared @ffmpeg/util `toBlobURL` fetches the
-                // script as a Blob so the dynamic-import path the
-                // engine uses internally is same-origin. Required,
-                // not optional.
-                const coreBlob = await toBlobURL(coreURL, "text/javascript");
-                const wasmBlob = await toBlobURL(wasmURL, "application/wasm");
-
-                const inst = new FFmpeg();
-                inst.on("progress", ({ progress: p }: { progress: number }) => {
-                    setFfmpegProgress(Math.round(p * 100));
-                });
-                ffmpegRef.current = inst;
-                await inst.load({ coreURL: coreBlob, wasmURL: wasmBlob });
-
-                setFfmpegStatus("loaded");
-            } catch (e) {
-                console.error("FFmpeg load failed:", e);
-                // No user-facing banner; the file-pick / preview flow
-                // still works without the engine. Only the actual
-                // merge button needs it.
-                setFfmpegStatus("error");
-            }
-        };
-        loadFFmpeg();
-    }, []);
+    // Engine load is handled by useFfmpegEngine above.
 
     /* -------------------------------------------------------------- */
     /* File pick / state setters                                      */
@@ -468,7 +432,7 @@ const AudioVideoMerger = () => {
     };
 
     const handleMerge = async () => {
-        if (!ffmpegRef.current) {
+        if (!ffmpeg) {
             setError("Engine not ready yet. If this persists, try refreshing the page.");
             setStatus("error");
             return;
@@ -487,6 +451,7 @@ const AudioVideoMerger = () => {
         setError(null);
         setStatus("merging");
         setProgress(0);
+        setMergePhase("writing-video");
         if (outputUrl) URL.revokeObjectURL(outputUrl);
         setOutputUrl(null);
         setOutputSize(0);
@@ -505,8 +470,9 @@ const AudioVideoMerger = () => {
         const safeAudioName = "audio" + getExt(audioFile.name);
 
         try {
-            const inst = ffmpegRef.current;
+            const inst = ffmpeg;
             await inst.writeFile(safeVideoName, await fetchFile(videoFile));
+            setMergePhase("writing-audio");
             await inst.writeFile(safeAudioName, await fetchFile(audioFile));
 
             const args = buildArgs(
@@ -520,9 +486,11 @@ const AudioVideoMerger = () => {
             // ffmpeg.wasm expects an ExecOptions object (so the
             // lib knows which input names to clean up) rather
             // than a bare string[].
+            setMergePhase("encoding");
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (inst as any).exec(args);
 
+            setMergePhase("reading");
             const data = await inst.readFile(outName);
             // `data` is a Uint8Array; wrap it in a Blob and create
             // a URL for the <video> preview / download.
@@ -532,6 +500,7 @@ const AudioVideoMerger = () => {
             setOutputSize(blob.size);
             setStatus("done");
             setProgress(100);
+            setMergePhase(null);
 
             // Clean up the virtual FS so the next merge starts
             // fresh (otherwise a follow-up merge of different
@@ -550,6 +519,7 @@ const AudioVideoMerger = () => {
             const msg = e instanceof Error ? e.message : String(e);
             setError(`Merge failed: ${msg}`);
             setStatus("error");
+            setMergePhase(null);
         }
     };
 
@@ -573,6 +543,7 @@ const AudioVideoMerger = () => {
         setOutputFileName("merged.mp4");
         setError(null);
         setProgress(0);
+        setMergePhase(null);
         setStatus("idle");
         if (videoInputRef.current) videoInputRef.current.value = "";
         if (audioInputRef.current) audioInputRef.current.value = "";
@@ -634,7 +605,7 @@ const AudioVideoMerger = () => {
 
             {ffmpegStatus === "loading" && (
                 <div className="bg-blue-900 border border-blue-700 text-blue-200 p-3 rounded mb-4 text-sm">
-                    Loading video engine… {ffmpegProgress}%
+                    Loading video engine…
                 </div>
             )}
 
@@ -828,11 +799,36 @@ const AudioVideoMerger = () => {
                 </button>
                 {status === "merging" && (
                     <div className="flex-1 min-w-[200px]">
-                        <div className="w-full h-2 bg-gray-700 rounded overflow-hidden">
-                            <div
-                                className="h-full bg-orange-500 transition-all duration-200"
-                                style={{ width: `${progress}%` }}
-                            />
+                        <div className="flex justify-between text-xs text-orange-300 mb-1">
+                            <span>
+                                {mergePhase === "writing-video" && "Loading video into engine…"}
+                                {mergePhase === "writing-audio" && "Loading audio into engine…"}
+                                {mergePhase === "encoding" && "Encoding…"}
+                                {mergePhase === "reading" && "Reading result…"}
+                                {!mergePhase && "Preparing…"}
+                            </span>
+                            <span>
+                                {progress > 0 ? `${progress}%` : ""}
+                            </span>
+                        </div>
+                        <div className="w-full h-2 bg-gray-700 rounded overflow-hidden relative">
+                            {progress > 0 ? (
+                                <div
+                                    className="h-full bg-orange-500 transition-all duration-200"
+                                    style={{ width: `${progress}%` }}
+                                />
+                            ) : (
+                                // Indeterminate animation for the
+                                // file-write phases (no progress
+                                // events fire during writeFile),
+                                // and as a fallback if the
+                                // encoding phase ever fails to
+                                // emit progress. The sliding bar
+                                // gives the user visual feedback
+                                // that work is happening without
+                                // claiming a specific percentage.
+                                <div className="absolute top-0 left-0 h-full w-1/3 bg-orange-500/70 animate-indeterminate rounded" />
+                            )}
                         </div>
                     </div>
                 )}

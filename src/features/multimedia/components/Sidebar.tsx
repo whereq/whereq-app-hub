@@ -7,6 +7,7 @@ import {
     faCompress,
     faScissors,
     faCirclePlus,
+    faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 import { SectionType } from "@/features/multimedia/models/MultimediaEnum";
 import { useMultimediaStore } from "@/features/multimedia/store/multimediaStore";
@@ -25,6 +26,7 @@ const TOOLS: { section: SectionType; icon: typeof faVideo; label: string }[] = [
     { section: SectionType.GIF_COMPRESSOR, icon: faCompress, label: "GIF Compressor" },
     { section: SectionType.VIDEO_SPLITTER, icon: faScissors, label: "Video Splitter" },
     { section: SectionType.AUDIO_VIDEO_MERGER, icon: faCirclePlus, label: "Audio + Video Merger" },
+    { section: SectionType.GIF_MAKER, icon: faWandMagicSparkles, label: "GIF Maker" },
 ];
 
 export const Sidebar = () => {

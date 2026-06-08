@@ -6,4 +6,5 @@ export enum SectionType {
     GIF_COMPRESSOR = "GIF Compressor",
     VIDEO_SPLITTER = "Video Splitter",
     AUDIO_VIDEO_MERGER = "Audio + Video Merger",
+    GIF_MAKER = "GIF Maker",
 }

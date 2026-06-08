@@ -11,6 +11,7 @@ import VideoToGif from "@/features/multimedia/components/VideoToGif";
 import GifCompressor from "@/features/multimedia/components/GifCompressor";
 import VideoSplitter from "@/features/multimedia/components/VideoSplitter";
 import AudioVideoMerger from "@/features/multimedia/components/AudioVideoMerger";
+import GifMaker from "@/features/multimedia/components/GifMaker";
 
 const Workspace = () => {
     const { activeSection } = useMultimediaStore();
@@ -26,6 +27,7 @@ const Workspace = () => {
             {activeSection === SectionType.GIF_COMPRESSOR && <GifCompressor />}
             {activeSection === SectionType.VIDEO_SPLITTER && <VideoSplitter />}
             {activeSection === SectionType.AUDIO_VIDEO_MERGER && <AudioVideoMerger />}
+            {activeSection === SectionType.GIF_MAKER && <GifMaker />}
         </div>
     );
 };

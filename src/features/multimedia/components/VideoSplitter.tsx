@@ -8,11 +8,8 @@ import {
     faPlay,
     faPause,
 } from "@fortawesome/free-solid-svg-icons";
-// @ffmpeg/ffmpeg ships its own types now (we no longer need a
-// @ts-expect-error for the import). If you're on an older version
-// of the lib and see a type error here, add the directive back.
-import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { fetchFile, toBlobURL } from "@ffmpeg/util";
+import { fetchFile } from "@ffmpeg/util";
+import { useFfmpegEngine } from "@/features/multimedia/hooks/useFfmpegEngine";
 import CustomModal from "@/components/modals/CustomModal";
 
 /**
@@ -77,7 +74,6 @@ import CustomModal from "@/components/modals/CustomModal";
  */
 
 type Status = "idle" | "cutting" | "done" | "error";
-type FfmpegLoadStatus = "loading" | "loaded" | "error";
 
 interface VideoMeta {
     name: string;
@@ -99,8 +95,6 @@ function thumbnailCountFor(duration: number): number {
     if (!isFinite(duration) || duration <= 0) return 8;
     return Math.min(20, Math.max(8, Math.ceil(duration)));
 }
-
-const FFMPEG_CORE_BASE = "/ffmpeg-core";
 
 /* ----------------------------------------------------------------- */
 /* Timeline                                                          */
@@ -445,12 +439,31 @@ async function extractThumbnails(file: File, duration: number): Promise<Thumbnai
 /* ----------------------------------------------------------------- */
 
 const VideoSplitter = () => {
-    const [ffmpeg, setFfmpeg] = useState<FFmpeg | null>(null);
-    const [ffmpegStatus, setFfmpegStatus] = useState<FfmpegLoadStatus>("loading");
-    const [ffmpegProgress, setFfmpegProgress] = useState(0);
+    // The FFmpeg engine is a module-level singleton shared across
+    // all Multimedia tools. Switching from VideoSplitter to
+    // AudioVideoMerger (or to the new GifMaker) doesn't pay the
+    // 30 MB core download a second time. See the hook file for
+    // the full reasoning.
+    const { ffmpeg, status: ffmpegStatus } = useFfmpegEngine();
+    // The hook fires the log handler; we only need to wire the
+    // per-component progress handler here. The progress event
+    // is fired by the shared FFmpeg instance, so the listener
+    // persists across remounts — that's OK, the setState in
+    // a defunct component is a no-op. If we want to be tidy
+    // later we can call inst.off() in cleanup, but @ffmpeg/ffmpeg
+    // 0.12 doesn't expose off(), so this is the pragmatic answer.
+    useEffect(() => {
+        if (!ffmpeg) return;
+        const handler = ({ progress: p }: { progress: number }) => {
+            const pct = Math.round(p * 100);
+            setProgress(pct);
+        };
+        ffmpeg.on("progress", handler);
+    }, [ffmpeg]);
+
     // FFmpeg errors are logged to the console (via console.error
-    // in the catch block) but never rendered to the user. The
-    // timeline/upload/thumbnail flow works without the engine, so
+    // in the hook's catch block) but never rendered to the user.
+    // The timeline/upload/thumbnail flow works without the engine, so
     // surfacing the error to the user would only scare them.
 
     const [file, setFile] = useState<File | null>(null);
@@ -495,7 +508,6 @@ const VideoSplitter = () => {
      *  in the timeline area so the user knows why the strip is empty. */
     const [isExtractingFrames, setIsExtractingFrames] = useState(false);
 
-    const ffmpegRef = useRef<FFmpeg | null>(null);
     const inputRef = useRef<HTMLInputElement | null>(null);
     /** Ref to the visible <video> element (the preview). We read its
      *  currentTime to update the playhead, and write to it when the
@@ -503,110 +515,8 @@ const VideoSplitter = () => {
     const videoPreviewRef = useRef<HTMLVideoElement | null>(null);
     const pendingFileRef = useRef<{ file: File } | null>(null);
     const [showResetWarning, setShowResetWarning] = useState<boolean>(false);
-    const [localCoreAvailable, setLocalCoreAvailable] = useState<boolean | null>(null);
 
-    // Load FFmpeg on mount. We do a HEAD probe first to decide between
-    // local files and the unpkg fallback.
-    useEffect(() => {
-        const loadFFmpeg = async () => {
-            try {
-                if (typeof SharedArrayBuffer === "undefined" || !window.crossOriginIsolated) {
-                    throw new Error(
-                        "SharedArrayBuffer is not available. This page must be served with COOP/COEP headers. " +
-                            "Vite dev server sets them automatically; production hosting must set " +
-                            "'Cross-Origin-Opener-Policy: same-origin' and " +
-                            "'Cross-Origin-Embedder-Policy: require-corp' on the response.",
-                    );
-                }
-
-                let coreURL: string;
-                let wasmURL: string;
-                let workerURL: string | undefined;
-                if (localCoreAvailable === null) {
-                    try {
-                        const probe = await fetch(`${FFMPEG_CORE_BASE}/ffmpeg-core.js`, { method: "HEAD" });
-                        setLocalCoreAvailable(probe.ok);
-                        if (probe.ok) {
-                            coreURL = `${FFMPEG_CORE_BASE}/ffmpeg-core.js`;
-                            wasmURL = `${FFMPEG_CORE_BASE}/ffmpeg-core.wasm`;
-                            workerURL = `${FFMPEG_CORE_BASE}/ffmpeg-core.worker.js`;
-                        } else {
-                            throw new Error("local 404");
-                        }
-                    } catch {
-                        const base = "https://unpkg.com/@ffmpeg/core@0.12.9/dist/esm";
-                        coreURL = `${base}/ffmpeg-core.js`;
-                        wasmURL = `${base}/ffmpeg-core.wasm`;
-                        workerURL = undefined;
-                    }
-                } else if (localCoreAvailable) {
-                    coreURL = `${FFMPEG_CORE_BASE}/ffmpeg-core.js`;
-                    wasmURL = `${FFMPEG_CORE_BASE}/ffmpeg-core.wasm`;
-                    workerURL = `${FFMPEG_CORE_BASE}/ffmpeg-core.worker.js`;
-                } else {
-                    const base = "https://unpkg.com/@ffmpeg/core@0.12.9/dist/esm";
-                    coreURL = `${base}/ffmpeg-core.js`;
-                    wasmURL = `${base}/ffmpeg-core.wasm`;
-                    workerURL = undefined;
-                }
-
-                const [coreBlob, wasmBlob] = await Promise.all([
-                    toBlobURL(coreURL, "text/javascript"),
-                    toBlobURL(wasmURL, "application/wasm"),
-                ]);
-
-                if (!ffmpegRef.current) {
-                    const inst = new FFmpeg();
-                    // The log event fires for every line ffmpeg writes
-                    // to stderr. It's noisy in normal use (per-frame
-                    // encoder stats, etc.) but invaluable when a cut
-                    // hangs and the user reports "no progress at all"
-                    // — we need to see what ffmpeg is doing. We log
-                    // at debug level so it doesn't spam the console
-                    // for normal use, and a developer can crank it
-                    // up to "info" via a filter in DevTools.
-                    inst.on("log", ({ message }: { message: string }) => {
-                        console.debug("[ffmpeg]", message);
-                    });
-                    // The progress event fires for re-encoding
-                    // operations. For `-c copy` (stream copy) cuts,
-                    // ffmpeg doesn't emit progress events at all —
-                    // the seek + stream copy is too fast to
-                    // meaningfully report percentages. We update
-                    // the cut-phase progress here when the event
-                    // does fire; the UI shows an indeterminate
-                    // animation as a fallback.
-                    inst.on("progress", ({ progress: p }: { progress: number }) => {
-                        const pct = Math.round(p * 100);
-                        setFfmpegProgress(pct);
-                        setProgress(pct);
-                    });
-                    ffmpegRef.current = inst;
-                }
-                const inst = ffmpegRef.current;
-
-                const loadConfig: { coreURL: string; wasmURL: string; workerURL?: string } = {
-                    coreURL: coreBlob,
-                    wasmURL: wasmBlob,
-                };
-                if (workerURL) {
-                    (loadConfig as { workerURL?: string }).workerURL = workerURL;
-                }
-                await inst.load(loadConfig);
-
-                setFfmpeg(inst);
-                setFfmpegStatus("loaded");
-            } catch (e) {
-                console.error("FFmpeg load failed:", e);
-                // No user-facing error banner; the engine
-                // failure is silent to the user because the
-                // timeline/upload/thumbnail flow still works.
-                setFfmpegStatus("error");
-            }
-        };
-        loadFFmpeg();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    // Engine load is handled by useFfmpegEngine above.
 
     const probeVideo = (file: File): Promise<{ duration: number }> =>
         new Promise((resolve, reject) => {
@@ -890,7 +800,7 @@ const VideoSplitter = () => {
 
             {ffmpegStatus === "loading" && (
                 <div className="bg-blue-900 border border-blue-700 text-blue-200 p-3 rounded mb-4 text-sm">
-                    Loading video engine… {ffmpegProgress}%
+                    Loading video engine…
                 </div>
             )}
 
