@@ -974,17 +974,40 @@ const VideoSplitter = () => {
                         <div className="bg-red-900 border border-red-700 text-red-200 p-3 rounded text-sm">{error}</div>
                     )}
 
-                    <div className="flex gap-2">
-                        <button
-                            onClick={handleCut}
-                            disabled={ffmpegStatus !== "loaded" || status === "cutting" || endTime <= startTime}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded disabled:opacity-50"
-                        >
-                            {status === "cutting" ? "Cutting…" : "Cut video"}
-                        </button>
-                        <button onClick={reset} className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded">
-                            Clear
-                        </button>
+                    <div className="flex flex-col gap-2">
+                        <div className="flex gap-2">
+                            <button
+                                onClick={handleCut}
+                                disabled={ffmpegStatus !== "loaded" || status === "cutting" || endTime <= startTime}
+                                title={
+                                    ffmpegStatus === "error"
+                                        ? "Video engine not available in this browser — the cut step needs an API the browser doesn't support. Try refreshing, or use one of the other multimedia tools."
+                                        : ffmpegStatus === "loading"
+                                        ? "Loading video engine…"
+                                        : endTime <= startTime
+                                        ? "End time must be after start time"
+                                        : "Cut the video to the selected range"
+                                }
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded disabled:opacity-50"
+                            >
+                                {status === "cutting" ? "Cutting…" : "Cut video"}
+                            </button>
+                            <button onClick={reset} className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded">
+                                Clear
+                            </button>
+                        </div>
+                        {/* Small, inline reason when the button is disabled for
+                            an environmental reason. The big "Video engine
+                            unavailable" banner was too loud; this one is
+                            scoped to the button so the user can see exactly
+                            what's wrong without the page shouting at them. */}
+                        {ffmpegStatus === "error" && (
+                            <p className="text-xs text-yellow-300/80">
+                                Cut step is unavailable in this browser. The upload, timeline, and
+                                preview still work — only the actual cut needs an API this browser
+                                doesn't support.
+                            </p>
+                        )}
                     </div>
 
                     {outputUrl && (
