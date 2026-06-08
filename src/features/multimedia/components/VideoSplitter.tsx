@@ -4,11 +4,9 @@ import {
     faUpload,
     faDownload,
     faScissors,
-    faInfoCircle,
     faFilm,
     faPlay,
     faPause,
-    faRotateRight,
 } from "@fortawesome/free-solid-svg-icons";
 // @ffmpeg/ffmpeg ships its own types now (we no longer need a
 // @ts-expect-error for the import). If you're on an older version
@@ -256,10 +254,11 @@ const Timeline = ({
                 aria-valuemax={duration}
                 aria-valuenow={currentTime}
             >
-                {/* Highlighted cut range: green tinted, between start
-                    and end handles. */}
+                {/* Highlighted cut range: orange tint, between start
+                    and end handles. 1px borders (not 2px) so the
+                    handles themselves are the visual focal point. */}
                 <div
-                    className="absolute top-0 bottom-0 bg-green-600 bg-opacity-30 border-x-2 border-green-500 pointer-events-none"
+                    className="absolute top-0 bottom-0 bg-orange-500/20 border-x border-orange-400/60 pointer-events-none"
                     style={{ left: `${startPct}%`, width: `${Math.max(0, endPct - startPct)}%` }}
                 />
 
@@ -269,34 +268,56 @@ const Timeline = ({
                     style={{ left: `${playheadPct}%` }}
                 />
 
-                {/* Start handle: 12px wide bar on the left edge of the
-                    cut range. Always above the rail (z-10) so it
-                    receives pointer events. */}
+                {/* Start handle: thin 4px white bar with chevron
+                    grips on top and bottom. White = high contrast
+                    against the dark rail and the orange highlight.
+                    Chevron on top is the standard "draggable" cue
+                    in video editors (Figma, Premiere, Final Cut).
+                    On hover the white turns to the app's orange
+                    accent to confirm interaction. The handle is
+                    above the rail (z-10) so it receives pointer
+                    events. */}
                 <div
                     onPointerDown={beginDrag("start")}
                     onPointerMove={onDragMove}
                     onPointerUp={endDrag}
                     onPointerCancel={endDrag}
-                    className="absolute top-0 bottom-0 w-3 -ml-1.5 bg-green-500 hover:bg-green-400 cursor-ew-resize z-10 rounded-sm"
+                    className="group absolute top-0 bottom-0 w-1 -ml-0.5 bg-white hover:bg-orange-300 cursor-ew-resize z-10"
                     style={{ left: `${startPct}%` }}
                     title={`Start: ${startTime.toFixed(2)}s`}
+                    role="slider"
+                    aria-label="Trim start time"
+                    aria-valuemin={0}
+                    aria-valuemax={duration}
+                    aria-valuenow={startTime}
                 >
-                    <div className="absolute top-0.5 left-0.5 right-0.5 h-1 bg-green-300 rounded-sm" />
-                    <div className="absolute bottom-0.5 left-0.5 right-0.5 h-1 bg-green-300 rounded-sm" />
+                    {/* Chevron grip on top — small triangle pointing
+                        down toward the handle. Standard draggable
+                        affordance in timeline UIs. */}
+                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[3px] border-r-[3px] border-b-[3px] border-l-transparent border-r-transparent border-b-white opacity-80 group-hover:border-b-orange-300" />
+                    {/* Chevron grip on bottom — mirror. */}
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[3px] border-r-[3px] border-t-[3px] border-l-transparent border-r-transparent border-t-white opacity-80 group-hover:border-t-orange-300" />
                 </div>
 
-                {/* End handle: mirror of start, on the right edge. */}
+                {/* End handle: identical visual to start, on the
+                    right edge of the cut range. Symmetric design
+                    so the two handles read as a pair. */}
                 <div
                     onPointerDown={beginDrag("end")}
                     onPointerMove={onDragMove}
                     onPointerUp={endDrag}
                     onPointerCancel={endDrag}
-                    className="absolute top-0 bottom-0 w-3 -ml-1.5 bg-red-500 hover:bg-red-400 cursor-ew-resize z-10 rounded-sm"
+                    className="group absolute top-0 bottom-0 w-1 -ml-0.5 bg-white hover:bg-orange-300 cursor-ew-resize z-10"
                     style={{ left: `${endPct}%` }}
                     title={`End: ${endTime.toFixed(2)}s`}
+                    role="slider"
+                    aria-label="Trim end time"
+                    aria-valuemin={0}
+                    aria-valuemax={duration}
+                    aria-valuenow={endTime}
                 >
-                    <div className="absolute top-0.5 left-0.5 right-0.5 h-1 bg-red-300 rounded-sm" />
-                    <div className="absolute bottom-0.5 left-0.5 right-0.5 h-1 bg-red-300 rounded-sm" />
+                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[3px] border-r-[3px] border-b-[3px] border-l-transparent border-r-transparent border-b-white opacity-80 group-hover:border-b-orange-300" />
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[3px] border-r-[3px] border-t-[3px] border-l-transparent border-r-transparent border-t-white opacity-80 group-hover:border-t-orange-300" />
                 </div>
             </div>
 
@@ -427,7 +448,10 @@ const VideoSplitter = () => {
     const [ffmpeg, setFfmpeg] = useState<FFmpeg | null>(null);
     const [ffmpegStatus, setFfmpegStatus] = useState<FfmpegLoadStatus>("loading");
     const [ffmpegProgress, setFfmpegProgress] = useState(0);
-    const [ffmpegError, setFfmpegError] = useState<string | null>(null);
+    // FFmpeg errors are logged to the console (via console.error
+    // in the catch block) but never rendered to the user. The
+    // timeline/upload/thumbnail flow works without the engine, so
+    // surfacing the error to the user would only scare them.
 
     const [file, setFile] = useState<File | null>(null);
     const [meta, setMeta] = useState<VideoMeta | null>(null);
@@ -544,8 +568,9 @@ const VideoSplitter = () => {
                 setFfmpegStatus("loaded");
             } catch (e) {
                 console.error("FFmpeg load failed:", e);
-                const msg = e instanceof Error ? e.message : String(e);
-                setFfmpegError(msg);
+                // No user-facing error banner; the engine
+                // failure is silent to the user because the
+                // timeline/upload/thumbnail flow still works.
                 setFfmpegStatus("error");
             }
         };
@@ -824,7 +849,7 @@ const VideoSplitter = () => {
                 )}
             </div>
             <p className="text-sm text-gray-400 mb-4">
-                Trim a video by start and end timestamps. Drag the green / red handles on the timeline, or click a thumbnail to jump there. Cuts run in your browser — instant cuts, no quality loss.
+                Trim a video by start and end timestamps. Drag the handles on the timeline, or click a thumbnail to jump there. Cuts run in your browser — instant cuts, no quality loss.
             </p>
 
             {ffmpegStatus === "loading" && (
@@ -833,42 +858,14 @@ const VideoSplitter = () => {
                 </div>
             )}
 
-            {ffmpegStatus === "error" && ffmpegError && (
-                // Soft warning, not a panic error. Yellow/amber
-                // instead of red, info icon instead of red
-                // exclamation. Don't show the raw `ffmpegError`
-                // text — it's a developer-facing string with
-                // COOP/COEP/SharedArrayBuffer jargon that doesn't
-                // help the user. The friendly explanation below
-                // covers the most common cases (browser
-                // doesn't support SharedArrayBuffer, the page
-                // is loaded in an embedded iframe, etc.).
-                <div className="bg-yellow-900/40 border border-yellow-700/60 text-yellow-200 p-4 rounded mb-4 text-sm">
-                    <div className="flex items-start gap-2">
-                        <FontAwesomeIcon icon={faInfoCircle} className="mt-0.5 shrink-0 text-base" />
-                        <div className="flex-1">
-                            <div className="font-bold mb-1 text-yellow-100">Video engine unavailable in this browser</div>
-                            <p className="mb-2">
-                                The browser is missing a security feature this tool needs to run. The
-                                upload area still works below — you can pick a file to see its
-                                timeline and thumbnails — but the actual cut step won't work. Try
-                                one of these:
-                            </p>
-                            <ul className="list-disc list-inside space-y-1 mb-3 text-yellow-300/90">
-                                <li>Refresh the page to retry loading the engine</li>
-                                <li>Open this app in a regular browser tab (some embedded browsers, like WeChat's, block the required APIs)</li>
-                                <li>Use one of the other multimedia tools in the sidebar — GIF Compressor, Video to GIF, and Image Format Converter all work without the video engine</li>
-                            </ul>
-                            <button
-                                onClick={() => window.location.reload()}
-                                className="inline-flex items-center gap-1.5 bg-yellow-700/40 hover:bg-yellow-700/60 text-yellow-100 px-3 py-1.5 rounded text-xs border border-yellow-600/60 transition"
-                            >
-                                <FontAwesomeIcon icon={faRotateRight} /> Retry
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Note: we deliberately do NOT show an error banner
+                when the video engine fails to load. The user can
+                still upload a file, see the timeline, drag the
+                handles, scrub through the video, and review what
+                the cut would be — only the actual export (Cut
+                button) needs the engine. The error is logged to
+                the console for developers; the user gets a
+                non-scary UX. */}
 
             {/* Note: the developer-facing hosting requirements
                 (COOP/COEP headers, etc.) used to be shown here as
