@@ -518,9 +518,15 @@ const GifMaker = () => {
                 setProgress(Math.round(((i + 1) / segments.length) * 30));
             }
 
-            // Build the filter_complex. Each input is normalized to a
-            // 30fps 640px-wide video (height auto via -2), then fed
-            // into the `concat` filter which joins them.
+            // Build the filter_complex. Each input is normalized to
+            // a fixed 16:9 frame of (maxWidth, maxWidth*9/16) with
+            // letterbox/pillarbox padding so the concat filter
+            // always sees matching dimensions — regardless of
+            // whether the source videos are 16:9, 4:3, 1:1, 21:9,
+            // etc. Without this normalization, ffmpeg's `concat`
+            // filter produces a malformed MP4 (0×0 dimensions) when
+            // sources have different aspect ratios, which is the
+            // most common "prepare two videos" failure.
             //
             // For video segments, we use `-ss/-t` to seek + trim
             // BEFORE the input reaches the filter graph (faster than
@@ -528,6 +534,10 @@ const GifMaker = () => {
             //
             // For image segments, we use `-loop 1 -t N` so the image
             // is shown for the user-chosen duration.
+            //
+            // The target height is rounded to a multiple of 2
+            // because libx264's yuv420p encoder rejects odd heights.
+            const targetH = Math.max(2, Math.round((maxWidth * 9) / 16 / 2) * 2);
             const filterParts: string[] = [];
             const argParts: string[] = [];
 
@@ -539,12 +549,24 @@ const GifMaker = () => {
                     argParts.push("-t", String(seg.trim.end - seg.trim.start));
                     argParts.push("-i", input.name);
                     filterParts.push(
-                        `[${i}:v]scale=${maxWidth}:-2,fps=30,setpts=PTS-STARTPTS[v${i}]`,
+                        // scale-to-fit inside the target box, then
+                        // pad to the exact target size. Black bars
+                        // for source video whose aspect doesn't
+                        // match the target 16:9. The
+                        // `setpts=PTS-STARTPTS` resets timestamps so
+                        // the concat filter sees continuous time
+                        // across the trimmed clip.
+                        `[${i}:v]scale=${maxWidth}:${targetH}:force_original_aspect_ratio=decrease,pad=${maxWidth}:${targetH}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30,setpts=PTS-STARTPTS[v${i}]`,
                     );
                 } else {
                     argParts.push("-loop", "1", "-t", String(seg.duration), "-i", input.name);
                     filterParts.push(
-                        `[${i}:v]scale=${maxWidth}:-2,fps=30,setpts=PTS-STARTPTS[v${i}]`,
+                        // Image: scale up if needed to cover the
+                        // target box (so small images fill it), then
+                        // crop to the exact target. This avoids
+                        // letterboxing images that are smaller than
+                        // the target.
+                        `[${i}:v]scale=${maxWidth}:${targetH}:force_original_aspect_ratio=increase,crop=${maxWidth}:${targetH},setsar=1,fps=30,setpts=PTS-STARTPTS[v${i}]`,
                     );
                 }
             }
@@ -586,7 +608,11 @@ const GifMaker = () => {
             const url = URL.createObjectURL(blob);
             setPreparedUrl(url);
             setPreparedSize(blob.size);
-            // Probe duration from a hidden <video>
+            // Probe duration + dimensions from a hidden <video>.
+            // We need both because the actual encoded size can differ
+            // from maxWidth/targetH (e.g. if any video rejected
+            // yuv420p encoding and ffmpeg fell back to a different
+            // pix_fmt, the height could shift by a row).
             const v = document.createElement("video");
             v.preload = "metadata";
             v.src = url;
@@ -595,6 +621,17 @@ const GifMaker = () => {
                 v.onerror = () => res();
             });
             setPreparedDuration(v.duration || 0);
+            setPreparedSize(blob.size);
+            // If the encoded size is wildly different from what we
+            // requested, surface that as an error so the user knows
+            // prepare succeeded but produced something unexpected.
+            if (v.videoWidth === 0 || v.videoHeight === 0) {
+                setError("Prepare finished but the output video has no dimensions. This usually means the concat filter rejected the input streams.");
+                setStatus("error");
+                URL.revokeObjectURL(url);
+                setPreparedUrl(null);
+                return;
+            }
             setStatus("ready");
             setProgress(100);
         } catch (e) {
