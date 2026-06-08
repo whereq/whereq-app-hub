@@ -4,10 +4,11 @@ import {
     faUpload,
     faDownload,
     faScissors,
-    faCircleExclamation,
+    faInfoCircle,
     faFilm,
     faPlay,
     faPause,
+    faRotateRight,
 } from "@fortawesome/free-solid-svg-icons";
 // @ffmpeg/ffmpeg ships its own types now (we no longer need a
 // @ts-expect-error for the import). If you're on an older version
@@ -833,24 +834,37 @@ const VideoSplitter = () => {
             )}
 
             {ffmpegStatus === "error" && ffmpegError && (
-                <div className="bg-red-900 border border-red-700 text-red-200 p-3 rounded mb-4 text-sm">
+                // Soft warning, not a panic error. Yellow/amber
+                // instead of red, info icon instead of red
+                // exclamation. Don't show the raw `ffmpegError`
+                // text — it's a developer-facing string with
+                // COOP/COEP/SharedArrayBuffer jargon that doesn't
+                // help the user. The friendly explanation below
+                // covers the most common cases (browser
+                // doesn't support SharedArrayBuffer, the page
+                // is loaded in an embedded iframe, etc.).
+                <div className="bg-yellow-900/40 border border-yellow-700/60 text-yellow-200 p-4 rounded mb-4 text-sm">
                     <div className="flex items-start gap-2">
-                        <FontAwesomeIcon icon={faCircleExclamation} className="mt-0.5 shrink-0" />
-                        <div>
-                            <div className="font-bold mb-1">Video engine failed to load.</div>
-                            <div className="font-mono text-xs">{ffmpegError}</div>
-                            {ffmpegError.includes("SharedArrayBuffer") && (
-                                <div className="mt-2">
-                                    The page is being served without the security headers required for the
-                                    video engine. Try refreshing the page, or contact the site admin.
-                                </div>
-                            )}
-                            {ffmpegError.includes("failed to import ffmpeg-core") && (
-                                <div className="mt-2">
-                                    The video engine's core script couldn't load. Try refreshing the page,
-                                    or check your network connection.
-                                </div>
-                            )}
+                        <FontAwesomeIcon icon={faInfoCircle} className="mt-0.5 shrink-0 text-base" />
+                        <div className="flex-1">
+                            <div className="font-bold mb-1 text-yellow-100">Video engine unavailable in this browser</div>
+                            <p className="mb-2">
+                                The browser is missing a security feature this tool needs to run. The
+                                upload area still works below — you can pick a file to see its
+                                timeline and thumbnails — but the actual cut step won't work. Try
+                                one of these:
+                            </p>
+                            <ul className="list-disc list-inside space-y-1 mb-3 text-yellow-300/90">
+                                <li>Refresh the page to retry loading the engine</li>
+                                <li>Open this app in a regular browser tab (some embedded browsers, like WeChat's, block the required APIs)</li>
+                                <li>Use one of the other multimedia tools in the sidebar — GIF Compressor, Video to GIF, and Image Format Converter all work without the video engine</li>
+                            </ul>
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="inline-flex items-center gap-1.5 bg-yellow-700/40 hover:bg-yellow-700/60 text-yellow-100 px-3 py-1.5 rounded text-xs border border-yellow-600/60 transition"
+                            >
+                                <FontAwesomeIcon icon={faRotateRight} /> Retry
+                            </button>
                         </div>
                     </div>
                 </div>
