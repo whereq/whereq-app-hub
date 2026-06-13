@@ -30,7 +30,7 @@ export function UniverseFooter() {
               style={{ fontSize: 14, marginTop: 14, maxWidth: "24em" }}
             >
               A living ecosystem built on 5W + 1H. Broadcast from mission
-              control at whereq.github.io.
+              control at whereq.ca.
             </p>
           </div>
           <div className="footer-links">
