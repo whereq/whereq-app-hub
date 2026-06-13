@@ -11,7 +11,7 @@ const FOOTER_LINKS: FooterLink[] = [
   { label: "WhereQ.ca — WHY", href: "https://www.whereq.ca", external: true },
   { label: "FlowDesk — HOW", href: "https://www.flowdesk.top", external: true },
   { label: "CCBus — HOW", href: "https://www.ccbus.cc", external: true },
-  { label: "Catobigato — HOW", href: "https://www.catobigato.com", external: true },
+  { label: "CatoBigato — HOW", href: "https://www.catobigato.com", external: true },
   { label: "whereq.github.io — WHAT", href: "https://whereq.github.io", external: true },
 ];
 

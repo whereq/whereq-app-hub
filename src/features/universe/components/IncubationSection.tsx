@@ -23,7 +23,7 @@ const GRADS: { accent: string; name: string; text: string }[] = [
   },
   {
     accent: "var(--c-cato)",
-    name: "Catobigato",
+    name: "CatoBigato",
     text: "Graduated as the learning planet — vibe tutoring for K-12 and beyond.",
   },
 ];

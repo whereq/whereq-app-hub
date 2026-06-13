@@ -7,7 +7,7 @@ const CELLS: { c: string; q: string; prod: string; what: string }[] = [
   { c: "var(--c-when)", q: "WHEN", prod: "ChroniQ", what: "The temporal engine. Time, events, booking." },
   { c: "var(--c-why)", q: "WHY", prod: "WhereQ.ca", what: "The research station. Ideas are tested here first." },
   { c: "var(--c-what)", q: "WHAT", prod: "whereq.github.io", what: "Mission control. The public voice of the universe." },
-  { c: "var(--ink-soft)", q: "HOW", prod: "The incubated", what: "FlowDesk, CCBus, Catobigato — proof the system works." },
+  { c: "var(--ink-soft)", q: "HOW", prod: "The incubated", what: "FlowDesk, CCBus, CatoBigato — proof the system works." },
 ];
 
 /** Section 2 — the origin story: 5W + 1H mapped to real platforms. */

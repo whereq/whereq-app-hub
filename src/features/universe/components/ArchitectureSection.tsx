@@ -18,7 +18,7 @@ export function ArchitectureSection() {
             className="arch-svg"
             viewBox="0 0 1200 660"
             role="img"
-            aria-label="Architecture diagram: the product layer (FlowDesk, CCBus, Catobigato) depends on the announcement and experiment layers, which depend on the identity, location and time foundation layers."
+            aria-label="Architecture diagram: the product layer (FlowDesk, CCBus, CatoBigato) depends on the announcement and experiment layers, which depend on the identity, location and time foundation layers."
           >
             <defs>
               <marker
@@ -37,7 +37,7 @@ export function ArchitectureSection() {
             <rect className="arch-layer-rect" x="150" y="30" width="900" height="120" rx="6" stroke="rgba(233,239,246,0.35)" />
             <text className="arch-label" x="180" y="65">PRODUCT LAYER · HOW</text>
             <text className="arch-name" x="180" y="100">
-              FlowDesk <tspan fill="#6E7C90">·</tspan> CCBus <tspan fill="#6E7C90">·</tspan> Catobigato
+              FlowDesk <tspan fill="#6E7C90">·</tspan> CCBus <tspan fill="#6E7C90">·</tspan> CatoBigato
             </text>
             <text className="arch-sub" x="180" y="126">flowdesk.top · ccbus.cc · catobigato.com</text>
             <circle cx="985" cy="90" r="7" fill="#3FD68F" />

@@ -6,7 +6,7 @@ const Q_ROWS: { c: string; q: string; label: string }[] = [
   { c: "var(--c-when)", q: "WHEN", label: "ChroniQ" },
   { c: "var(--c-why)", q: "WHY", label: "WhereQ.ca" },
   { c: "var(--c-what)", q: "WHAT", label: "whereq.github.io" },
-  { c: "var(--ink-soft)", q: "HOW", label: "FlowDesk · CCBus · Catobigato" },
+  { c: "var(--ink-soft)", q: "HOW", label: "FlowDesk · CCBus · CatoBigato" },
 ];
 
 /** Section 1 — full-screen animated universe hero. */

@@ -212,7 +212,7 @@ export const UNIVERSE: Universe = {
     {
       id: "cato",
       question: "HOW",
-      name: "Catobigato",
+      name: "CatoBigato",
       domain: "catobigato.com",
       url: "https://www.catobigato.com",
       ring: "outer",
@@ -273,7 +273,7 @@ export const UNIVERSE: Universe = {
     {
       era: "past",
       planet: "cato",
-      title: "Catobigato starts teaching",
+      title: "CatoBigato starts teaching",
       text: "The chubby cat tutor welcomes its first students.",
     },
     {

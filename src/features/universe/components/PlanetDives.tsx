@@ -135,7 +135,7 @@ const DIVES: Dive[] = [
   {
     id: "cato",
     q: "HOW · INCUBATED",
-    name: "Catobigato",
+    name: "CatoBigato",
     domain: "catobigato.com",
     accent: "var(--c-cato)",
     metaphor: "The Knowledge Galaxy — your chubby cat tutor.",
