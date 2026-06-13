@@ -15,12 +15,12 @@ export interface AppCardProps {
 export const AppCard = ({ name, icon, description, path, onClick }: AppCardProps) => (
   <Link
     to={path}
-    className="block p-4 border border-gray-700 rounded-lg bg-blue-900 text-orange-300 shadow-lg hover:shadow-xl transform transition-transform hover:-translate-y-1 focus:ring-2 focus:ring-orange-500"
+    className="block p-4 border border-[rgba(168,190,216,0.12)] rounded-lg bg-[#0E141C] text-[#E9EFF6] shadow-lg hover:shadow-xl transform transition-transform hover:-translate-y-1 hover:border-[rgba(77,168,240,0.4)] focus:ring-2 focus:ring-[#4DA8F0]"
     onClick={onClick} // Call the onClick handler
   >
     <div className="flex flex-col items-center justify-between h-full">
       {/* Icon */}
-      <div className="text-orange-400 text-4xl mb-3">
+      <div className="text-[#4DA8F0] text-4xl mb-3">
         {typeof icon === "object" ? (
           <FontAwesomeIcon icon={icon as IconDefinition} /> // FontAwesome Icons
         ) : (
@@ -32,7 +32,7 @@ export const AppCard = ({ name, icon, description, path, onClick }: AppCardProps
       <h3 className="text-xl font-bold text-center font-mono">{name}</h3>
 
       {/* Description */}
-      <p className="text-sm text-center text-orange-200 mt-2 hidden">{description}</p>
+      <p className="text-sm text-center text-[#8b949e] mt-2 hidden">{description}</p>
     </div>
   </Link>
 );

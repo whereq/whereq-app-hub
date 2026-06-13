@@ -32,7 +32,7 @@ export const RESPONSE_TYPE = {
     ARRAY_BUFFER: "arrayBuffer",
 }
 
-export const APPLICATION_NAME = 'WhereQ App Hub';
+export const APPLICATION_NAME = 'WhereQ Lab';
 export const LOCAL_STORAGE_APPLICATION_NAME = 'WhereQ_App_Hub';
 
 export const PUBLIC_API_YAML = "https://github.com/whereq/whereq-app-hub/blob/main/src/resources/public-api/public-api.yaml";

@@ -51,7 +51,8 @@ export const handleCopy = <T,>(object: T, successMessage: string) => {
 };
 
 export const routeTitles: Record<string, string> = {
-  "/": "Home",
+  "/": "Universe",
+  "/lab": "Lab",
   "/event-board": "App Event Board",
   "/about": "About",
   "/contact": "Contact",

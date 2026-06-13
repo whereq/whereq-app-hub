@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome, faChalkboard, faInfoCircle, faEnvelope, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faChalkboard, faInfoCircle, faEnvelope, faUser, faGlobe } from "@fortawesome/free-solid-svg-icons";
 import { NavLink, useLocation } from "react-router-dom";
 import { AppLauncher } from "@/components/app-launcher/AppLauncher";
 import { useAppStore } from "@/store/store";
@@ -50,8 +50,8 @@ export const Header = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0
-                       z-10 bg-blue-900 text-orange-300
-                       border-b-2 border-orange-700
+                       z-10 bg-[#0A0E13] text-[#E9EFF6]
+                       border-b border-[rgba(168,190,216,0.12)]
                        shadow-md h-[3.125rem]">
       <div className="w-full h-full flex items-center justify-between px-2 sm:px-4 gap-2 sm:gap-4">
         {/* App Title with Navigation Path.
@@ -70,11 +70,23 @@ export const Header = () => {
             to give the title more room. `flex-none` prevents the nav
             from being squeezed by the title flex-1 above. */}
         <nav className="flex items-center space-x-1.5 sm:space-x-4 flex-none">
+          {/* Universe — the public entrance / ecosystem map (full-bleed,
+              outside this shell). The Lab home below is the app hub. */}
           <NavLink
             to="/"
-            title="Home"
+            title="WhereQ Universe"
             className={({ isActive }) =>
-              `hover:text-orange-400 transition-colors ${isActive ? "text-orange-400" : ""}`
+              `hover:text-[#4DA8F0] transition-colors ${isActive ? "text-[#4DA8F0]" : ""}`
+            }
+            onClick={closeAppDrawer}
+          >
+            <FontAwesomeIcon icon={faGlobe} size="lg" />
+          </NavLink>
+          <NavLink
+            to="/lab"
+            title="Lab"
+            className={({ isActive }) =>
+              `hover:text-[#4DA8F0] transition-colors ${isActive ? "text-[#4DA8F0]" : ""}`
             }
             onClick={closeAppDrawer} // Close AppLauncher on click
           >
@@ -84,7 +96,7 @@ export const Header = () => {
             to="/event-board"
             title="App Event Board"
             className={({ isActive }) =>
-              `hover:text-orange-400 transition-colors ${isActive ? "text-orange-400" : ""}`
+              `hover:text-[#4DA8F0] transition-colors ${isActive ? "text-[#4DA8F0]" : ""}`
             }
             onClick={closeAppDrawer} // Close AppLauncher on click
           >
@@ -94,7 +106,7 @@ export const Header = () => {
             to="/about"
             title="About"
             className={({ isActive }) =>
-              `hover:text-orange-400 transition-colors ${isActive ? "text-orange-400" : ""}`
+              `hover:text-[#4DA8F0] transition-colors ${isActive ? "text-[#4DA8F0]" : ""}`
             }
             onClick={closeAppDrawer} // Close AppLauncher on click
           >
@@ -104,7 +116,7 @@ export const Header = () => {
             to="/contact"
             title="Contact Us"
             className={({ isActive }) =>
-              `hover:text-orange-400 transition-colors ${isActive ? "text-orange-400" : ""}`
+              `hover:text-[#4DA8F0] transition-colors ${isActive ? "text-[#4DA8F0]" : ""}`
             }
             onClick={closeAppDrawer} // Close AppLauncher on click
           >
@@ -118,7 +130,7 @@ export const Header = () => {
             to={isAuthenticated ? "/profile" : "/signin"}
             title={isAuthenticated ? "My Profile" : "Sign In/Sign Up"}
             className={({ isActive }) =>
-              `hover:text-orange-400 transition-colors ${isActive ? "text-orange-400" : ""}`
+              `hover:text-[#4DA8F0] transition-colors ${isActive ? "text-[#4DA8F0]" : ""}`
             }
             onClick={closeAppDrawer}
           >

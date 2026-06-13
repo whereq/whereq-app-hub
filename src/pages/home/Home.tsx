@@ -36,7 +36,24 @@ const Home = () => {
   };
 
   return (
-    <div className="h-full bg-gray-900 text-orange-300 font-fira-code p-4">
+    <div className="min-h-full bg-gray-900 text-[#E9EFF6] font-fira-code p-4 sm:p-6">
+      {/* Lab header — the research station of the WhereQ Universe. */}
+      <header className="mb-6 max-w-3xl">
+        <p className="font-mono text-[11px] tracking-[0.3em] text-[#8b949e]">
+          WHEREQ.CA — THE RESEARCH STATION
+        </p>
+        <h1 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-[#E9EFF6]">
+          WhereQ Lab
+        </h1>
+        <p className="mt-2 text-sm text-[#8b949e]">
+          Where ideas are tested first. Every experiment, tool and prototype in
+          the universe is incubated here.{" "}
+          <a href="/" className="text-[#4DA8F0] hover:underline">
+            Back to the Universe ↗
+          </a>
+        </p>
+      </header>
+
       {/* Responsive Grid */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {apps.map((app) => (

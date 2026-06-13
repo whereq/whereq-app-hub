@@ -1,7 +1,7 @@
 import { useRef, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faUser,
+  faFlask,
   faHexagonNodes,
   faMap,
   faCalendar,
@@ -52,7 +52,7 @@ export const AppLauncher = () => {
 
   // App List with routes
   const apps = [
-    { name: "User", icon: faUser, path: "/" },
+    { name: "Lab", icon: faFlask, path: "/lab" },
     { name: "API Exp", icon: faHexagonNodes, path: "/api-explorer" },
     { name: "Map", icon: faMap, path: "/map" },
     { name: "Calendar", icon: faCalendar, path: "/calendar" },

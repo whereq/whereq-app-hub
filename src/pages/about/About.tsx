@@ -16,9 +16,9 @@ type Project = {
 
 const projects: Project[] = [
   {
-    name: "WhereQ App Hub",
+    name: "WhereQ Lab",
     description:
-      "Your all-in-one decentralized web application hub — productivity, education & personal management, all in one place. No cloud storage, no tracking.",
+      "The research station of the WhereQ Universe — an all-in-one decentralized app hub for productivity, education & personal management where every idea is tested first. No cloud storage, no tracking.",
     url: "https://www.whereq.ca",
     logo: "https://whereq.github.io/images/logo/whereq-com.png",
   },
