@@ -58,7 +58,7 @@ const DIVES: Dive[] = [
   {
     id: "when",
     q: "WHEN",
-    name: "ChroniQ",
+    name: "Chroniq",
     domain: "chroniq.cc",
     accent: "var(--c-when)",
     metaphor: "The Temporal Engine — time, orchestrated.",

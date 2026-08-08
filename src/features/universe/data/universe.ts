@@ -98,7 +98,7 @@ export const UNIVERSE: Universe = {
     {
       id: "when",
       question: "WHEN",
-      name: "ChroniQ",
+      name: "Chroniq",
       domain: "chroniq.cc",
       url: "https://www.chroniq.cc",
       ring: "inner",
@@ -279,7 +279,7 @@ export const UNIVERSE: Universe = {
     {
       era: "past",
       planet: "when",
-      title: "ChroniQ goes live",
+      title: "Chroniq goes live",
       text: "The temporal engine comes online — time, events, scheduling and booking.",
     },
     {

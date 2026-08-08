@@ -7,7 +7,7 @@ interface FooterLink {
 const FOOTER_LINKS: FooterLink[] = [
   { label: "WhereQ — WHERE", href: "https://www.whereq.com", external: true },
   { label: "KeyToMarvel — WHO", href: "https://www.keytomarvel.com", external: true },
-  { label: "ChroniQ — WHEN", href: "https://www.chroniq.cc", external: true },
+  { label: "Chroniq — WHEN", href: "https://www.chroniq.cc", external: true },
   { label: "WhereQ.ca — WHY", href: "https://www.whereq.ca/lab", external: true },
   { label: "FlowDesk — HOW", href: "https://www.flowdesk.top", external: true },
   { label: "CCBus — HOW", href: "https://www.ccbus.cc", external: true },

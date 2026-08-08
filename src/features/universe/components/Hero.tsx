@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 const Q_ROWS: { c: string; q: string; label: string }[] = [
   { c: "var(--c-where)", q: "WHERE", label: "WhereQ" },
   { c: "var(--c-who)", q: "WHO", label: "KeyToMarvel" },
-  { c: "var(--c-when)", q: "WHEN", label: "ChroniQ" },
+  { c: "var(--c-when)", q: "WHEN", label: "Chroniq" },
   { c: "var(--c-why)", q: "WHY", label: "WhereQ.ca" },
   { c: "var(--c-what)", q: "WHAT", label: "whereq.github.io" },
   { c: "var(--ink-soft)", q: "HOW", label: "FlowDesk · CCBus · CatoBigato" },

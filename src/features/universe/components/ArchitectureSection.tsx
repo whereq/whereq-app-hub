@@ -78,7 +78,7 @@ export function ArchitectureSection() {
 
             <rect className="arch-layer-rect" x="770" y="460" width="280" height="120" rx="6" stroke="rgba(167,139,250,0.5)" />
             <text className="arch-label" x="798" y="495" fill="#A78BFA">TIME · WHEN</text>
-            <text className="arch-name" x="798" y="530">ChroniQ</text>
+            <text className="arch-name" x="798" y="530">Chroniq</text>
             <text className="arch-sub" x="798" y="556">time · events · booking</text>
 
             {/* baseline */}
