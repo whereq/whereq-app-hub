@@ -63,9 +63,9 @@ const DIVES: Dive[] = [
     accent: "var(--c-when)",
     metaphor: "The Temporal Engine — time, orchestrated.",
     blurb:
-      "A planet still forming. Events, scheduling, booking, appointments and calendar intelligence — the temporal layer the rest of the universe will set its clocks by.",
+      "The time planet. Events, scheduling, booking, appointments and calendar intelligence — the temporal layer the rest of the universe sets its clocks by.",
     caps: ["Time & events", "Scheduling", "Booking & appointments", "Calendar intelligence"],
-    soon: true,
+    url: "https://www.chroniq.cc",
     motif: "ripple",
     frameUrl: "chroniq.cc",
     screenshot: "/images/planets/chroniq-cc.png",
@@ -209,7 +209,7 @@ export function PlanetDives() {
                 onZoom={d.screenshot ? () => setZoom(d) : undefined}
                 placeholder={
                   d.soon
-                    ? "ChroniQ — coming soon · preview pending"
+                    ? `${d.name} — coming soon · preview pending`
                     : `${d.name} — screenshot coming soon`
                 }
               />

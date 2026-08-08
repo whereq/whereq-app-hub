@@ -104,12 +104,12 @@ export const UNIVERSE: Universe = {
       ring: "inner",
       angle: 18,
       size: 40,
-      status: "soon",
+      status: "live",
       color: "#A78BFA",
       metaphor: "The Temporal Engine",
       tagline: "Time, orchestrated.",
       blurb:
-        "The time planet, currently forming. Events, scheduling, booking, appointments and calendar intelligence — the temporal layer the rest of the universe will set its clocks by.",
+        "The time planet. Events, scheduling, booking, appointments and calendar intelligence — the temporal layer the rest of the universe sets its clocks by.",
       responsibilities: [
         "Time & events",
         "Scheduling",
@@ -277,16 +277,16 @@ export const UNIVERSE: Universe = {
       text: "The chubby cat tutor welcomes its first students.",
     },
     {
+      era: "past",
+      planet: "when",
+      title: "ChroniQ goes live",
+      text: "The temporal engine comes online — time, events, scheduling and booking.",
+    },
+    {
       era: "now",
       planet: "what",
       title: "Mission Control goes live",
       text: "whereq.github.io becomes the public voice of the universe.",
-    },
-    {
-      era: "now",
-      planet: "when",
-      title: "ChroniQ is forming",
-      text: "The temporal engine is under construction. Coming soon.",
     },
     {
       era: "future",

@@ -76,10 +76,10 @@ export function ArchitectureSection() {
             <text className="arch-name" x="488" y="530">WhereQ</text>
             <text className="arch-sub" x="488" y="556">maps · routing · places</text>
 
-            <rect className="arch-layer-rect" x="770" y="460" width="280" height="120" rx="6" stroke="rgba(167,139,250,0.5)" strokeDasharray="5 5" />
+            <rect className="arch-layer-rect" x="770" y="460" width="280" height="120" rx="6" stroke="rgba(167,139,250,0.5)" />
             <text className="arch-label" x="798" y="495" fill="#A78BFA">TIME · WHEN</text>
             <text className="arch-name" x="798" y="530">ChroniQ</text>
-            <text className="arch-sub" x="798" y="556">coming soon</text>
+            <text className="arch-sub" x="798" y="556">time · events · booking</text>
 
             {/* baseline */}
             <text className="arch-label" x="600" y="640" textAnchor="middle" letterSpacing="6">
