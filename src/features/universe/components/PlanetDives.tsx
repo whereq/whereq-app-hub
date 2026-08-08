@@ -80,10 +80,10 @@ const DIVES: Dive[] = [
     blurb:
       "The laboratory of the universe. An app hub for experimentation, validation, prototyping and community feedback. Every innovation proves itself here before it earns an orbit of its own — including this very map of the universe, which lives here in the lab.",
     caps: ["Experimentation", "Validation", "Prototyping", "Community feedback"],
-    url: "https://www.whereq.ca",
+    url: "https://www.whereq.ca/lab",
     motif: "lab",
     flip: true,
-    frameUrl: "whereq.ca",
+    frameUrl: "whereq.ca/lab",
     screenshot: "/images/planets/whereq-ca.png",
   },
   {
