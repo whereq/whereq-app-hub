@@ -231,13 +231,60 @@ export const UNIVERSE: Universe = {
         "K-12 → all ages",
       ],
     },
+    {
+      id: "cloud",
+      question: "HOW",
+      name: "WhereQ Cloud",
+      domain: "whereq.cloud",
+      url: "https://whereq.cloud",
+      ring: "outer",
+      angle: 200,
+      size: 34,
+      status: "live",
+      color: "#38BDF8",
+      metaphor: "The Data Platform",
+      tagline: "One source of truth for every world.",
+      blurb:
+        "The data backbone beneath the products. It owns the shared database schema and runs all data collection — market data, feeds and metrics streaming from free-tier providers into a single source of truth that every product reads from.",
+      responsibilities: [
+        "Shared data schema",
+        "Scheduled data collection",
+        "Market & feed pipelines",
+        "Collection monitoring",
+      ],
+    },
+    {
+      id: "cc",
+      question: "HOW",
+      name: "WhereQ.cc",
+      domain: "whereq.cc",
+      url: "https://whereq.cc",
+      ring: "outer",
+      angle: 270,
+      size: 34,
+      status: "live",
+      color: "#D946EF",
+      metaphor: "The Private Gallery",
+      tagline: "A photo vault that stays in your browser.",
+      blurb:
+        "The strictly-local photo planet. Your originals live encrypted in your own browser and never leave it — while on-demand AI can enhance, describe and animate a single image whenever you ask.",
+      responsibilities: [
+        "Local-first photo vault",
+        "In-browser encryption",
+        "AI enhancement",
+        "Albums & sharing",
+      ],
+    },
   ],
 
   edges: [
     /* products are born in the lab and announced from mission control */
-    { from: "flowdesk", to: ["who", "where", "when", "why", "what"] },
+    { from: "flowdesk", to: ["who", "where", "when", "why", "what", "cloud"] },
     { from: "ccbus", to: ["who", "why", "what"] },
     { from: "cato", to: ["who", "when", "why", "what"] },
+    { from: "cc", to: ["who", "why", "what"] },
+    /* the data platform feeds the products and trusts the identity core */
+    { from: "cloud", to: ["who"] },
     /* the foundational planets trust the identity core */
     { from: "where", to: ["who"] },
     { from: "when", to: ["who"] },
@@ -281,6 +328,18 @@ export const UNIVERSE: Universe = {
       planet: "when",
       title: "Chroniq goes live",
       text: "The temporal engine comes online — time, events, scheduling and booking.",
+    },
+    {
+      era: "past",
+      planet: "cloud",
+      title: "WhereQ Cloud centralizes the data",
+      text: "The data platform takes over all collection — one schema, one source of truth for the family.",
+    },
+    {
+      era: "past",
+      planet: "cc",
+      title: "WhereQ.cc opens the gallery",
+      text: "A strictly-local photo vault with on-demand AI enhancement — photos that never leave the browser.",
     },
     {
       era: "now",

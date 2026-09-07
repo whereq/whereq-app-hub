@@ -27,6 +27,8 @@
   --c-flowdesk: #3fd68f;
   --c-ccbus: #f08a4b;
   --c-cato: #f47b6b;
+  --c-cloud: #38bdf8;
+  --c-cc: #d946ef;
 
   --font-display: "Space Grotesk", "Avenir Next", sans-serif;
   --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
@@ -528,6 +530,19 @@
   background-size: 34px 34px;
   mask-image: radial-gradient(50% 80% at 24% 52%, black, transparent 70%);
 }
+.wq-universe .dive[data-motif="cloud"]::before {
+  background-image:
+    repeating-linear-gradient(90deg, color-mix(in oklab, var(--accent) 9%, transparent) 0 1px, transparent 1px 34px),
+    repeating-linear-gradient(0deg, color-mix(in oklab, var(--accent) 5%, transparent) 0 1px, transparent 1px 34px);
+  background-size: 34px 34px;
+  mask-image: radial-gradient(58% 90% at 80% 48%, black, transparent 74%);
+}
+.wq-universe .dive[data-motif="gallery"]::before {
+  background-image: linear-gradient(color-mix(in oklab, var(--accent) 8%, transparent) 2px, transparent 2px),
+    linear-gradient(90deg, color-mix(in oklab, var(--accent) 8%, transparent) 2px, transparent 2px);
+  background-size: 46px 46px;
+  mask-image: radial-gradient(56% 88% at 22% 50%, black, transparent 72%);
+}
 
 /* screenshot frame (also styled by the reusable ScreenFrame component) */
 .wq-universe .screen-frame {
@@ -715,7 +730,7 @@
 .wq-universe .incu-grads {
   margin-top: 70px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 18px;
 }
 .wq-universe .grad-card {

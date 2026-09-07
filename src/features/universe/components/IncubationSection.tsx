@@ -26,6 +26,11 @@ const GRADS: { accent: string; name: string; text: string }[] = [
     name: "CatoBigato",
     text: "Graduated as the learning planet — vibe tutoring for K-12 and beyond.",
   },
+  {
+    accent: "var(--c-cc)",
+    name: "WhereQ.cc",
+    text: "Graduated as the photo planet — a strictly-local gallery with on-demand AI enhancement.",
+  },
 ];
 
 /** Section 5 — how new planets are incubated and graduate. */

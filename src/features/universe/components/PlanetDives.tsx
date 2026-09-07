@@ -148,6 +148,37 @@ const DIVES: Dive[] = [
     frameUrl: "catobigato.com",
     screenshot: "/images/planets/catobigato-com.png",
   },
+  {
+    id: "cloud",
+    q: "HOW · PLATFORM",
+    name: "WhereQ Cloud",
+    domain: "whereq.cloud",
+    accent: "var(--c-cloud)",
+    metaphor: "The Data Platform — one source of truth for every world.",
+    blurb:
+      "The data backbone that sits beneath the products. It owns the shared PostgreSQL schema and runs every collection job — market data, feeds and metrics flowing from free-tier providers into one database, so FlowDesk and the rest read from a single source of truth.",
+    caps: ["Shared data schema", "Scheduled collection", "Market & feed pipelines", "Collection monitoring"],
+    url: "https://whereq.cloud",
+    motif: "cloud",
+    frameUrl: "whereq.cloud",
+    screenshot: "/images/planets/whereq-cloud.png",
+  },
+  {
+    id: "cc",
+    q: "HOW · INCUBATED",
+    name: "WhereQ.cc",
+    domain: "whereq.cc",
+    accent: "var(--c-cc)",
+    metaphor: "The Private Gallery — a photo vault that stays in your browser.",
+    blurb:
+      "The strictly-local photo planet. Originals live encrypted in your own browser and never leave it — while on-demand AI can enhance, describe and animate a single image whenever you ask.",
+    caps: ["Local-first vault", "In-browser encryption", "AI enhancement", "Albums & sharing"],
+    url: "https://whereq.cc",
+    motif: "gallery",
+    flip: true,
+    frameUrl: "whereq.cc",
+    screenshot: "/images/planets/whereq-cc.png",
+  },
 ];
 
 /** Section 4 — one deep-dive panel per platform. */

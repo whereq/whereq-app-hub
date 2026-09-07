@@ -34,6 +34,7 @@ it is, with enough specifics to be actionable.
 16. [Deployment, headers, and the COOP/COEP contract](#16-deployment-headers-and-the-coopcoep-contract)
 17. [Known issues, dead code, and tech debt](#17-known-issues-dead-code-and-tech-debt)
 18. [Adding a new feature — playbook](#18-adding-a-new-feature--playbook)
+19. [Release & Deploy Runbook](#19-release--deploy-runbook)
 
 ---
 
@@ -1794,6 +1795,247 @@ These are the load-bearing facts (from MEMORY.md and USER.md):
   react-ga4, just set the env var" over pasting the Google-
   provided gtag.js snippet. Respect existing work over canonical
   patterns.
+
+---
+
+## 19. Release & Deploy Runbook
+
+This is the step-by-step procedure for cutting a release of WhereQ
+App Hub and shipping it to production. Section 16 above covers the
+single most load-bearing config invariant (COOP/COEP); this section
+covers the *process*.
+
+### 19.1 Environments
+
+| Environment | URL | What it runs |
+|-------------|-----|--------------|
+| Local dev | `http://localhost:5173` | `yarn dev` — Vite dev server with HMR. Same COOP/COEP headers as prod. |
+| Local prod preview | `http://localhost:4173` | `yarn build && yarn preview` — Vite's preview of the production build. **Use this to smoke-test before deploy** — it serves `dist/` with the same headers as Vercel. |
+| Production | `https://whereq-app-hub.vercel.app` (and any custom domains) | Vercel auto-deploys from `main` branch on push. |
+
+There is **no staging environment** and **no manual deploy gate**.
+Pushing to `main` is the deploy. Vercel preview deployments are
+created automatically for every PR; use the PR preview URL for
+review before merging.
+
+### 19.2 The 4 npm scripts
+
+The full toolchain is four scripts (from `package.json`):
+
+```bash
+yarn dev      # vite — dev server on :5173 with HMR
+yarn build    # vite build — production bundle to ./dist/
+yarn preview  # vite preview — serves ./dist/ on :4173 with prod headers
+yarn lint     # eslint . — must be 0 errors before any commit
+```
+
+There is **no `yarn test`** — the `package.json` lists
+`@testing-library/react` and friends in `devDependencies` but no
+test runner is configured. Manual smoke tests are the QA strategy.
+See §19.6 below.
+
+### 19.3 Build artifacts
+
+`yarn build` outputs to `dist/`. The current full build is ~66 MB,
+dominated by:
+
+- `assets/chunk-*.js` — split bundles (heavy: FFmpeg core, MathJax,
+  ONNX Runtime, Pyodide, CodeMirror, etc.)
+- `assets/fira-code-*.woff2` — web fonts
+- `ffmpeg-core/` — ffmpeg.wasm core + worker (lazy-loaded only when
+  a multimedia tool is opened, ~30 MB)
+- `gif.worker.js` — the gif.js web worker
+- `images/`, `logos/` — static assets
+- `silent-check-sso.html` — Keycloak auth callback page
+
+The bundle warning `Adjust chunk size limit for this warning via
+build.chunkSizeWarningLimit` is **expected and not an error**. The
+intentional decision is: don't code-split further, ship the heavy
+deps (ffmpeg, mathjax) in one bundle so the multimedia + math
+features work without a network race after first load. See §17
+(Known issues) for why this is acceptable.
+
+### 19.4 Environment variables
+
+Only **one** runtime env var matters:
+
+| Var | Required in prod? | Where to set |
+|-----|-------------------|--------------|
+| `VITE_GA4_MEASUREMENT_ID` | Optional (analytics is no-op without it) | Vercel env vars (Production only) |
+| `VITE_ENV` | No — used to gate `utils/logUtil.ts`'s `log()` recursion bug | Never set it |
+
+**The `.env.example` file documents the GA4 setup.** Vite only
+exposes env vars prefixed `VITE_` to the client bundle, so the GA
+"measurement ID" (a public identifier) is safe to commit in
+`.env.example`. Vercel project settings is the place to set it for
+production — see §11 (Analytics) above for the full flow.
+
+**The `Keycloak` client config is hardcoded** in
+`src/auth/keycloak.ts`. If you need to point at a different
+Keycloak realm for staging/prod, edit that file directly — there's
+no env-var abstraction yet (see §17 known issues).
+
+### 19.5 The pre-deploy checklist
+
+Before every deploy, run these locally and confirm:
+
+```bash
+# 1. Lint must be clean (0 errors; warnings OK if at baseline).
+yarn lint
+#   → expected: "✖ 24 problems (0 errors, 24 warnings)" or fewer.
+
+# 2. TypeScript build must succeed.
+yarn build
+#   → expected: "✓ built in <N>s"
+#   → the "Adjust chunk size limit" line is NOT a failure.
+
+# 3. (Manual) smoke-test the production build locally.
+yarn build && yarn preview
+#   → open http://localhost:4173
+#   → walk through: load /, click each major route in the sidebar,
+#     open the multimedia workspace, click Prepare on a sample video
+#     to verify ffmpeg.wasm loads (this is the COOP/COEP smoke test
+#     — see §16). If the engine fails to load, the headers are
+#     broken. Stop here.
+
+# 4. (Manual) confirm vercel.json still mirrors vite.config.ts.
+git diff HEAD~1 -- vite.config.ts vercel.json
+#   → the three COOP/COEP/CORP values must be identical between
+#     the two files. If they diverge, the prod build will fail in
+#     a way no one notices until users complain. See §16.
+
+# 5. (Manual) update docs/releases/ if the release is user-visible.
+#   → see §19.7 below for the release-notes format.
+```
+
+### 19.6 Manual smoke tests (no automated test suite)
+
+The `yarn build` + `yarn preview` flow above is the primary QA.
+Beyond that, before each release:
+
+1. **COOP/COEP smoke test** — open the multimedia workspace, add a
+   short video, click Prepare. If FFmpeg loads and the prepare
+   preview appears, headers are good. If the engine throws
+   `SharedArrayBuffer is not defined` or just silently doesn't
+   load, headers are broken — check §16.
+2. **ONNX Runtime smoke test** — open any feature that uses
+   `@imgly/background-removal` (the image background-removal
+   tool). If the WASM model loads, the bundled WASM files are
+   wired correctly. If it stalls, check `optimizeDeps.include` in
+   `vite.config.ts`.
+3. **Keycloak SSO** — sign in once. `silent-check-sso.html` must
+   be served at `/silent-check-sso.html` (it is — see the `dist/`
+   listing above).
+4. **Universe landing page** — visit `/`, scroll through all
+   sections, click a planet. The 8 planets, the incubation
+   pipeline, and the footer should all render.
+5. **About page** — visit `/about`. The project grid should show
+   the 8 projects currently listed.
+6. **At least one GA4 event** — open DevTools → Network, filter
+   for `google-analytics`, perform an action. Should see at least
+   one `page_view`.
+
+If any of these fail, **do not push to `main`**.
+
+### 19.7 Cutting a release
+
+The current version field in `package.json` is `"0.0.0"` — this is
+intentional. There is **no semver discipline** in this repo; every
+push to `main` is implicitly a release. The user-facing release
+notes live in `docs/releases/<version>.md` with this naming
+convention:
+
+- `v<MAJOR>.<MINOR>.<PATCH>-<codename>-YYYY-MM-DD.md`
+- Example (already shipped): `v1.0.0-galaxy-2026-06-16.md`
+
+**Front-matter schema** (YAML):
+
+```yaml
+---
+version: 1.2.3          # matches the filename
+codename: galaxy        # human name; can repeat
+date: 2026-06-16        # ISO date
+status: shipped         # shipped | yanked | draft
+audience: public        # public | internal
+---
+```
+
+The body of a release note should contain:
+
+1. **Headline** — one-sentence product framing.
+2. **What's in this release** — short index of deliverables.
+3. **The 5W + 1H / big-picture framing** (if applicable) — see
+   `v1.0.0-galaxy-2026-06-16.md` for the canonical example.
+4. **Per-feature sections** — one per planet / product added or
+   changed, with link to the live page.
+5. **Roadmap** — past / now / future, in three bullet lists.
+6. **Links** — quick reference table at the end.
+
+### 19.8 Deploying
+
+There is **no manual deploy command**. The flow is:
+
+1. Merge your PR to `main`.
+2. Vercel auto-detects the push via the connected GitHub repo and
+   starts a build. The Vercel build runs `yarn build` (no install
+   step needed because Vercel caches `node_modules`).
+3. Vercel uses `vercel.json` to:
+   - Inject the three COOP/COEP/CORP headers on every response.
+   - Rewrite all unmatched paths to `/index.html` (SPA fallback
+     so client-side routes work on hard refresh).
+4. The deploy URL is shown in the Vercel dashboard. The
+   `whereq-app-hub.vercel.app` production alias updates within
+   ~30s of deploy completion.
+
+To roll back:
+
+- **Vercel dashboard** → Project → Deployments → click a previous
+  green deployment → "Promote to Production". This is instant and
+  doesn't require a git revert.
+- If the rollback is more than one revision behind, you can also
+  push a revert commit to `main`, which triggers a normal deploy.
+
+### 19.9 Branch & PR conventions
+
+There is no enforced branching model in the repo (no
+`.github/CODEOWNERS`, no PR template, no required checks). The
+observed convention is:
+
+- Feature work happens on `feature/<short-name>` branches.
+- Bugs happen on `fix/<short-name>` branches.
+- PRs go to `main`.
+- Commit messages follow the loose convention
+  `Add <thing>` / `Fix <thing>` / `Refactor <thing>` (the git log
+  is full of these — see `git log --oneline`).
+
+This isn't enforced. If you want stricter conventions, add a
+`CONTRIBUTING.md` and a PR template — the repo doesn't have one.
+
+### 19.10 Troubleshooting deploy failures
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Vercel build fails on type errors | New TS errors introduced | Run `yarn build` locally, fix the type errors. |
+| Prod loads but ffmpeg.wasm fails to init | COOP/COEP mismatch | See §16. Check `vite.config.ts` and `vercel.json` are identical. |
+| Prod loads but `silent-check-sso.html` 404s | Missing public file | Re-add to `public/` — Vite copies the whole `public/` tree. |
+| Prod shows a blank page | Routing 404 — Vercel not falling back to `index.html` | Check the `rewrites` block in `vercel.json`. The current `source: "/(.*)"` → `destination: "/index.html"` is correct. |
+| Prod serves stale assets after deploy | Browser cache | Hard-refresh (Cmd-Shift-R / Ctrl-Shift-R). Vite's content-hash filenames (`chunk-XXXX.js`) should bust the cache normally. |
+| GA4 events not firing in prod | `VITE_GA4_MEASUREMENT_ID` not set in Vercel | Set it in Vercel → Settings → Environment Variables → Production. See §11. |
+
+### 19.11 What this doc does NOT cover
+
+- **No CI/CD config** — there is no `.github/workflows/`,
+  no `.gitlab-ci.yml`. Vercel's auto-deploy from GitHub IS the CI/CD.
+- **No environment promotion** — there's no manual "promote staging to
+  prod" gate. `main` is the only deploy target.
+- **No feature flags** — all features ship enabled. If you need a
+  feature flag system, see §18 (Adding a new feature) and consider
+  extending `LocalSettings` to support per-feature toggles.
+- **No CDN config** — Vercel's edge network handles this
+  automatically.
+- **No post-deploy monitoring** — there is no Sentry / Datadog /
+  LogRocket integration. Errors surface only via user reports.
+  Adding one is a good follow-up; see §11 for the GA4-only setup.
 
 ---
 
