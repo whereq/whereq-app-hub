@@ -275,6 +275,29 @@ export const UNIVERSE: Universe = {
         "Albums & sharing",
       ],
     },
+    {
+      id: "qhaul",
+      question: "HOW",
+      name: "QHaul",
+      domain: "qhaul.ca",
+      url: "https://qhaul.ca",
+      ring: "outer",
+      angle: 288,
+      size: 34,
+      status: "live",
+      color: "#FD5E02",
+      metaphor: "The Freight Engine",
+      tagline: "Need it moved? QHaul it.",
+      blurb:
+        "The logistics planet. A B2B marketplace connecting Canadian businesses with local driver supply — freight, courier and small moves across the GTA and beyond. Customer orgs, driver portal, admin tooling and mobile apps, all riding on the shared identity, location and time foundations.",
+      responsibilities: [
+        "Freight & courier",
+        "Local driver supply",
+        "B2B marketplace",
+        "Driver mobile app",
+        "Booking & dispatch",
+      ],
+    },
   ],
 
   edges: [
@@ -283,6 +306,7 @@ export const UNIVERSE: Universe = {
     { from: "ccbus", to: ["who", "why", "what"] },
     { from: "cato", to: ["who", "when", "why", "what"] },
     { from: "cc", to: ["who", "why", "what"] },
+    { from: "qhaul", to: ["who", "where", "when", "why", "what"] },
     /* the data platform feeds the products and trusts the identity core */
     { from: "cloud", to: ["who"] },
     /* the foundational planets trust the identity core */
@@ -346,6 +370,12 @@ export const UNIVERSE: Universe = {
       planet: "what",
       title: "Mission Control goes live",
       text: "whereq.github.io becomes the public voice of the universe.",
+    },
+    {
+      era: "now",
+      planet: "qhaul",
+      title: "QHaul goes live",
+      text: "The freight engine enters orbit — a B2B marketplace for Canadian shipping, with the Android driver app in 内测 and iOS on the way.",
     },
     {
       era: "future",

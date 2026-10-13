@@ -4,6 +4,15 @@ import { Kicker } from "@/components/section/Kicker";
 import { ScreenFrame } from "@/components/screen-frame/ScreenFrame";
 import { ImageLightbox } from "@/components/lightbox/ImageLightbox";
 
+interface AppLink {
+  label: string;
+  href?: string;
+  /** Visual tone — "live" is the default orange CTA; "soon" is disabled. */
+  tone?: "live" | "soon";
+  /** Short note shown beneath the button (e.g. 内测 status). */
+  note?: string;
+}
+
 interface Dive {
   id: string;
   q: string;
@@ -21,6 +30,10 @@ interface Dive {
   frameUrl: string;
   /** Optional screenshot; placeholder is shown until one is supplied. */
   screenshot?: string;
+  /** Optional app-download block (mobile apps). */
+  apps?: AppLink[];
+  /** Optional blurb shown above the app-download block. */
+  appsNote?: string;
 }
 
 const DIVES: Dive[] = [
@@ -179,6 +192,42 @@ const DIVES: Dive[] = [
     frameUrl: "whereq.cc",
     screenshot: "/images/planets/whereq-cc.png",
   },
+  {
+    id: "qhaul",
+    q: "HOW · INCUBATED",
+    name: "QHaul",
+    domain: "qhaul.ca",
+    accent: "var(--c-qhaul)",
+    metaphor: "The Freight Engine — anything moved, anywhere.",
+    blurb:
+      "The logistics planet. A B2B marketplace connecting Canadian businesses with local driver supply — freight, courier and small moves across the GTA and beyond. Customer orgs, driver portal, admin tooling and mobile apps, all riding on the shared identity, location and time foundations.",
+    caps: [
+      "Freight & courier",
+      "Local driver supply",
+      "B2B marketplace",
+      "Driver mobile app",
+      "Booking & dispatch",
+    ],
+    url: "https://qhaul.ca",
+    motif: "truck",
+    frameUrl: "qhaul.ca",
+    screenshot: "/images/planets/qhaul-ca.png",
+    apps: [
+      {
+        label: "iOS — App Store",
+        tone: "soon",
+        note: "Coming soon",
+      },
+      {
+        label: "Android — APK",
+        href: "https://github.com/whereq/whereq-app-hub/raw/main/public/resources/qhaul.ca/apps/qhaul-android.apk",
+        tone: "live",
+        note: "内测 build",
+      },
+    ],
+    appsNote:
+      "Currently in 内测 (closed beta) for our first driver partners. Both apps will be published to the App Store and Google Play once they're ready for the general public.",
+  },
 ];
 
 /** Section 4 — one deep-dive panel per platform. */
@@ -230,6 +279,36 @@ export function PlanetDives() {
                   </a>
                 )}
               </div>
+              {d.apps && d.apps.length > 0 && (
+                <div className="dive-apps" data-reveal="">
+                  <p className="dive-apps-label">DOWNLOAD THE APP</p>
+                  <div className="dive-apps-row">
+                    {d.apps.map((a) =>
+                      a.tone === "soon" || !a.href ? (
+                        <span
+                          key={a.label}
+                          className="dive-app-btn is-soon"
+                          aria-disabled="true"
+                          title={a.note ?? "Coming soon"}
+                        >
+                          {a.label}
+                        </span>
+                      ) : (
+                        <a
+                          key={a.label}
+                          className="dive-app-btn"
+                          href={a.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {a.label} ↗
+                        </a>
+                      ),
+                    )}
+                  </div>
+                  {d.appsNote && <p className="dive-apps-note">{d.appsNote}</p>}
+                </div>
+              )}
             </div>
             <div className="dive-media" data-reveal="">
               <ScreenFrame

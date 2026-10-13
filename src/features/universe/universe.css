@@ -29,6 +29,7 @@
   --c-cato: #f47b6b;
   --c-cloud: #38bdf8;
   --c-cc: #d946ef;
+  --c-qhaul: #fd5e02;
 
   --font-display: "Space Grotesk", "Avenir Next", sans-serif;
   --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
@@ -542,6 +543,60 @@
     linear-gradient(90deg, color-mix(in oklab, var(--accent) 8%, transparent) 2px, transparent 2px);
   background-size: 46px 46px;
   mask-image: radial-gradient(56% 88% at 22% 50%, black, transparent 72%);
+}
+.wq-universe .dive[data-motif="truck"]::before {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--accent) 14%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--accent) 14%, transparent) 1px, transparent 1px);
+  background-size: 80px 80px, 80px 80px;
+  mask-image: radial-gradient(60% 90% at 78% 50%, black, transparent 74%);
+}
+
+/* mobile-app download block (used by qhaul dive) */
+.wq-universe .dive-apps { margin-top: 24px; }
+.wq-universe .dive-apps-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.28em;
+  color: var(--ink-dim);
+  margin: 0 0 12px;
+}
+.wq-universe .dive-apps-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.wq-universe .dive-app-btn {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  text-decoration: none;
+  color: color-mix(in oklab, var(--accent) 72%, white 28%);
+  background: color-mix(in oklab, var(--accent) 14%, transparent);
+  border: 1px solid color-mix(in oklab, var(--accent) 52%, transparent);
+  padding: 10px 18px;
+  border-radius: var(--r-ctl);
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+.wq-universe .dive-app-btn:hover {
+  background: color-mix(in oklab, var(--accent) 26%, transparent);
+  box-shadow: 0 0 26px color-mix(in oklab, var(--accent) 24%, transparent);
+  transform: translateY(-1px);
+}
+.wq-universe .dive-app-btn.is-soon {
+  color: var(--ink-dim);
+  background: transparent;
+  border-style: dashed;
+  border-color: color-mix(in oklab, var(--accent) 32%, transparent);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.wq-universe .dive-apps-note {
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--ink-dim);
+  font-style: italic;
+  max-width: 32em;
 }
 
 /* screenshot frame (also styled by the reusable ScreenFrame component) */
