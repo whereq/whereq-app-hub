@@ -220,7 +220,7 @@ const DIVES: Dive[] = [
       },
       {
         label: "Android — APK",
-        href: "https://github.com/whereq/whereq-app-hub/raw/main/public/resources/qhaul.ca/apps/qhaul-android.apk",
+        href: "/resources/qhaul.ca/apps/qhaul-android.apk",
         tone: "live",
         note: "内测 build",
       },
